@@ -1,0 +1,64 @@
+<form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="card-header">Base pricing</div>
+  <div class="card-body">
+
+    @if (success()) { <div class="alert alert-success" style="margin-bottom: 16px">Pricing saved.</div> }
+    @if (error()) { <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div> }
+
+    <div class="form-grid cols-4">
+      <div class="form-group">
+        <label class="form-label" for="hourlyPrice">Hourly</label>
+        <div class="input-prefix">
+          <span>&#8377;</span>
+          <input id="hourlyPrice" class="form-control" type="number" formControlName="hourlyPrice" />
+        </div>
+        @if (f.hourlyPrice.touched && f.hourlyPrice.errors) { <span class="form-error">Enter 0 or more.</span> }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="dailyPrice">Daily</label>
+        <div class="input-prefix">
+          <span>&#8377;</span>
+          <input id="dailyPrice" class="form-control" type="number" formControlName="dailyPrice" />
+        </div>
+        @if (f.dailyPrice.touched && f.dailyPrice.errors) { <span class="form-error">Enter 0 or more.</span> }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="weeklyPrice">Weekly</label>
+        <div class="input-prefix">
+          <span>&#8377;</span>
+          <input id="weeklyPrice" class="form-control" type="number" formControlName="weeklyPrice" />
+        </div>
+        @if (f.weeklyPrice.touched && f.weeklyPrice.errors) { <span class="form-error">Enter 0 or more.</span> }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="securityDeposit">Security deposit</label>
+        <div class="input-prefix">
+          <span>&#8377;</span>
+          <input id="securityDeposit" class="form-control" type="number" formControlName="securityDeposit" />
+        </div>
+        @if (f.securityDeposit.touched && f.securityDeposit.errors) { <span class="form-error">Enter 0 or more.</span> }
+      </div>
+    </div>
+
+    @if (f.dailyPrice.value > 0 && f.weeklyPrice.value > f.dailyPrice.value * 7) {
+      <div class="alert alert-warning" style="margin-top: 16px">
+        The weekly price is higher than 7 daily rentals, so it will never be the cheaper option.
+      </div>
+    }
+
+    <p class="form-hint" style="margin-top: 14px">
+      A quote uses the cheapest combination: leftover hours never cost more than one day,
+      and leftover days never cost more than one week. The deposit is added once per booking.
+    </p>
+
+    <div class="form-actions" style="margin-top: 16px">
+      <button type="submit" class="btn btn-primary" [disabled]="saving() || form.pristine">
+        @if (saving()) { <span class="btn-spinner"></span> }
+        {{ saving() ? 'Saving...' : 'Save pricing' }}
+      </button>
+    </div>
+  </div>
+</form>

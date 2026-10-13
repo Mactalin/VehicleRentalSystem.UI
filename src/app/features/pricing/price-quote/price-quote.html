@@ -1,0 +1,128 @@
+<app-page-header title="Price quote" subtitle="Estimate the cost of a rental for any vehicle and period" />
+
+@if (loadingVehicles()) {
+  <app-loading-spinner />
+} @else {
+  <div class="quote-layout">
+
+    <!-- Form -->
+    <form class="card" [formGroup]="form" (ngSubmit)="calculate()" novalidate>
+      <div class="card-header">Rental details</div>
+      <div class="card-body">
+
+        @if (error()) {
+          <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+        }
+
+        <div class="form-stack">
+          <div class="form-group">
+            <label class="form-label" for="vehicleId">Vehicle</label>
+            <select id="vehicleId" class="form-control" formControlName="vehicleId">
+              <option [ngValue]="0" disabled>Select a vehicle</option>
+              @for (v of vehicles(); track v.id) {
+                <option [ngValue]="v.id">
+                  {{ v.registrationNumber }} &ndash; {{ v.make }} {{ v.model }} ({{ v.categoryName }})
+                </option>
+              }
+            </select>
+            @if (f.vehicleId.touched && f.vehicleId.errors) {
+              <span class="form-error">Please choose a vehicle.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="from">Pickup</label>
+            <input id="from" class="form-control" type="datetime-local" formControlName="from" />
+            @if (f.from.touched && f.from.errors) {
+              <span class="form-error">Pickup time is required.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="to">Return</label>
+            <input id="to" class="form-control" type="datetime-local" formControlName="to" />
+            @if (f.to.touched && f.to.errors) {
+              <span class="form-error">Return time is required.</span>
+            } @else if (form.errors?.['order']) {
+              <span class="form-error">Return time must be after the pickup time.</span>
+            } @else if (form.errors?.['tooLong']) {
+              <span class="form-error">A rental can't be longer than 365 days.</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 20px">
+          <button type="submit" class="btn btn-primary" [disabled]="calculating()">
+            @if (calculating()) { <span class="btn-spinner"></span> }
+            {{ calculating() ? 'Calculating...' : 'Get quote' }}
+          </button>
+        </div>
+
+        <p class="form-hint" style="margin-top: 14px">
+          Any part of an hour is charged as a full hour. Tax, discounts and coupons are not included here.
+        </p>
+      </div>
+    </form>
+
+    <!-- Result -->
+    <div class="card">
+      <div class="card-header">Quote</div>
+
+      @if (quote(); as q) {
+        <div class="card-body">
+
+          <div class="quote-vehicle">
+            <div>
+              <h3>{{ q.registrationNumber }}</h3>
+              <span class="text-muted">{{ q.categoryName }}</span>
+            </div>
+            @if (selectedVehicle(); as v) {
+              <app-status-badge [status]="v.status" />
+            }
+          </div>
+
+          <div class="duration-chips">
+            <span class="chip">{{ q.totalHours | number }} hours in total</span>
+            @for (p of durationParts(q); track p) {
+              <span class="chip">{{ p }}</span>
+            }
+          </div>
+
+          <dl class="breakdown">
+            <div class="breakdown__row">
+              <dt>Base rental</dt>
+              <dd>{{ q.baseAmount | currency: 'INR' : 'symbol' : '1.0-2' }}</dd>
+            </div>
+
+            @if (q.seasonalMultiplier !== 1) {
+              <div class="breakdown__row">
+                <dt>Seasonal pricing ({{ percent(q.seasonalMultiplier) }})</dt>
+                <dd>{{ q.seasonalAdjustment | currency: 'INR' : 'symbol' : '1.0-2' }}</dd>
+              </div>
+            }
+
+            <div class="breakdown__row breakdown__row--sub">
+              <dt>Rental amount</dt>
+              <dd>{{ q.rentalAmount | currency: 'INR' : 'symbol' : '1.0-2' }}</dd>
+            </div>
+
+            <div class="breakdown__row">
+              <dt>Security deposit <span class="text-muted">(refundable)</span></dt>
+              <dd>{{ q.securityDeposit | currency: 'INR' : 'symbol' : '1.0-2' }}</dd>
+            </div>
+          </dl>
+
+          <div class="breakdown__total">
+            <span>Total payable</span>
+            <strong>{{ q.totalPayable | currency: 'INR' : 'symbol' : '1.0-2' }}</strong>
+          </div>
+        </div>
+      } @else {
+        <div class="quote-placeholder">
+          <h3>No quote yet</h3>
+          <p>Choose a vehicle and a rental period, then select "Get quote".</p>
+        </div>
+      }
+    </div>
+  </div>
+}

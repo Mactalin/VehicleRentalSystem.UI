@@ -1,0 +1,111 @@
+.auth {
+  display: grid;
+  grid-template-columns: minmax(380px, 1.05fr) 1fr;
+  min-height: 100vh;
+}
+
+/* ---------- Brand panel ---------- */
+.auth__brand {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px 48px;
+  color: #fff;
+  background: linear-gradient(145deg, var(--sidebar-bg) 0%, #312e81 60%, var(--primary) 120%);
+  overflow: hidden;
+}
+
+/* soft decorative circles */
+.auth__brand::before,
+.auth__brand::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .06);
+}
+.auth__brand::before { width: 420px; height: 420px; top: -140px; right: -160px; }
+.auth__brand::after  { width: 300px; height: 300px; bottom: -110px; left: -90px; }
+
+.auth__brand > * { position: relative; z-index: 1; }
+.auth__brand small { color: rgba(255, 255, 255, .55); }
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+
+.brand__logo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .15);
+  border: 1px solid rgba(255, 255, 255, .2);
+}
+.brand__logo svg { width: 24px; height: 24px; }
+
+/* ---------- Pitch ---------- */
+.auth__pitch { max-width: 460px; }
+
+.auth__pitch h1 {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -.02em;
+}
+
+.auth__pitch > p {
+  margin-top: 14px;
+  font-size: 16px;
+  color: rgba(255, 255, 255, .75);
+}
+
+.auth__pitch ul {
+  display: grid;
+  gap: 14px;
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.auth__pitch li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, .9);
+}
+
+.auth__pitch li svg {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  padding: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .16);
+}
+
+/* ---------- Form panel ---------- */
+.auth__form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  background: var(--bg);
+}
+
+.auth__content {
+  width: 100%;
+  max-width: 420px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .auth { grid-template-columns: 1fr; }
+  .auth__brand { display: none; }
+}

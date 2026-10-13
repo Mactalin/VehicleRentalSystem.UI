@@ -1,0 +1,51 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(17, 20, 43, .55);
+  backdrop-filter: blur(3px);
+  animation: fade-in .15s ease-out;
+}
+
+.dialog {
+  width: 100%;
+  max-width: 420px;
+  padding: 28px 24px 20px;
+  text-align: center;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  animation: pop-in .18s ease-out;
+}
+
+.dialog h2 { font-size: 18px; margin-bottom: 8px; }
+.dialog p  { color: var(--text-muted); line-height: 1.6; }
+
+.dialog__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 16px;
+  border-radius: 50%;
+}
+.dialog__icon[data-tone='danger']  { color: var(--danger);  background: var(--danger-soft); }
+.dialog__icon[data-tone='primary'] { color: var(--primary); background: var(--primary-soft); }
+
+.dialog__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+.dialog__actions .btn { flex: 1; }
+
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(8px) scale(.97); }
+  to   { opacity: 1; transform: none; }
+}

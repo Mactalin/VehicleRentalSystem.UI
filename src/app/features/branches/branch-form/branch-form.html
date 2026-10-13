@@ -1,0 +1,108 @@
+<a class="back-link" routerLink="/branches">&larr; Back to branches</a>
+
+<app-page-header
+  [title]="isEdit ? 'Edit branch' : 'Add branch'"
+  [subtitle]="isEdit ? 'Update the branch details and its weekly opening hours'
+                     : 'Create a branch, then set its opening hours'" />
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else {
+  <div class="form-wide">
+
+    <form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="card-header">Branch details</div>
+      <div class="card-body">
+
+        @if (success()) { <div class="alert alert-success" style="margin-bottom: 16px">{{ success() }}</div> }
+        @if (error()) { <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div> }
+
+        <section class="form-section">
+          <h3 class="form-section-title">Address</h3>
+          <div class="form-grid">
+
+            <div class="form-group span-2">
+              <label class="form-label" for="name">Branch name</label>
+              <input id="name" class="form-control" type="text" formControlName="name"
+                     placeholder="e.g. Main Branch" />
+              @if (f.name.touched && f.name.errors) { <span class="form-error">Branch name is required.</span> }
+            </div>
+
+            <div class="form-group span-2">
+              <label class="form-label" for="address">Street address</label>
+              <input id="address" class="form-control" type="text" formControlName="address"
+                     placeholder="Building, street, area" />
+              @if (f.address.touched && f.address.errors) { <span class="form-error">Address is required.</span> }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="city">City</label>
+              <input id="city" class="form-control" type="text" formControlName="city" />
+              @if (f.city.touched && f.city.errors) { <span class="form-error">City is required.</span> }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="state">State</label>
+              <input id="state" class="form-control" type="text" formControlName="state" />
+              @if (f.state.touched && f.state.errors) { <span class="form-error">State is required.</span> }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="pincode">Pincode</label>
+              <input id="pincode" class="form-control" type="text" inputmode="numeric" maxlength="6"
+                     formControlName="pincode" placeholder="620001" />
+              @if (f.pincode.touched && f.pincode.errors) { <span class="form-error">Enter a 6-digit pincode.</span> }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phone">Phone <span class="text-muted">(optional)</span></label>
+              <input id="phone" class="form-control" type="tel" formControlName="phone"
+                     placeholder="+91 98765 43210" />
+              @if (f.phone.touched && f.phone.errors) { <span class="form-error">Enter a valid phone number.</span> }
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h3 class="form-section-title">Map location <span class="text-muted">(optional)</span></h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="latitude">Latitude</label>
+              <input id="latitude" class="form-control" type="number" step="any" formControlName="latitude"
+                     placeholder="10.8050" />
+              @if (f.latitude.touched && f.latitude.errors) { <span class="form-error">Between -90 and 90.</span> }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="longitude">Longitude</label>
+              <input id="longitude" class="form-control" type="number" step="any" formControlName="longitude"
+                     placeholder="78.6856" />
+              @if (f.longitude.touched && f.longitude.errors) { <span class="form-error">Between -180 and 180.</span> }
+            </div>
+          </div>
+        </section>
+
+        @if (isEdit) {
+          <label class="check-row" style="margin-top: 20px">
+            <input type="checkbox" formControlName="isActive" /> Active (available for pickup and drop-off)
+          </label>
+        }
+
+        <div class="form-actions" style="margin-top: 24px">
+          <button type="submit" class="btn btn-primary"
+                  [disabled]="saving() || (isEdit && form.pristine)">
+            @if (saving()) { <span class="btn-spinner"></span> }
+            {{ saving() ? 'Saving...' : (isEdit ? 'Save changes' : 'Create branch') }}
+          </button>
+          <a class="btn btn-secondary" routerLink="/branches">{{ isEdit ? 'Back' : 'Cancel' }}</a>
+        </div>
+      </div>
+    </form>
+
+    @if (isEdit && branch(); as b) {
+      <div class="section-gap">
+        <app-operating-hours [branchId]="b.id" [hours]="b.operatingHours" (changed)="reload()" />
+      </div>
+    }
+  </div>
+}

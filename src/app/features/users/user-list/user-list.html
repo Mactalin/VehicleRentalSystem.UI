@@ -1,0 +1,115 @@
+<app-page-header title="Users" subtitle="Staff and customer accounts">
+  @if (isAdmin()) {
+    <a class="btn btn-primary" routerLink="/users/new">+ Add user</a>
+  }
+</app-page-header>
+
+<div class="card filters">
+  <div class="form-group grow">
+    <label class="form-label" for="search">Search</label>
+    <input id="search" class="form-control" type="search" placeholder="Name, email or phone"
+           [value]="search()" (input)="search.set($any($event.target).value)" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="role">Role</label>
+    <select id="role" class="form-control" #roleSel (change)="roleFilter.set($any(roleSel.value))">
+      <option value="">All roles</option>
+      @for (r of roles; track r) {
+        <option [value]="r" [selected]="roleFilter() === r">{{ r }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="status">Status</label>
+    <select id="status" class="form-control" #statusSel (change)="statusFilter.set($any(statusSel.value))">
+      <option value="">All</option>
+      <option value="active" [selected]="statusFilter() === 'active'">Active</option>
+      <option value="inactive" [selected]="statusFilter() === 'inactive'">Inactive</option>
+    </select>
+  </div>
+
+  <button type="button" class="btn btn-secondary" (click)="clearFilters()">Clear</button>
+</div>
+
+@if (success()) { <div class="alert alert-success" style="margin-bottom: 16px">{{ success() }}</div> }
+@if (error()) { <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div> }
+
+@if (loading()) {
+  <app-loading-spinner message="Loading users..." />
+} @else if (filtered().length === 0) {
+  <div class="card empty-state">
+    <h3>No users found</h3>
+    <p>Try changing the search or filters.</p>
+  </div>
+} @else {
+  <div class="card">
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Last login</th>
+            <th>Joined</th>
+            @if (isAdmin()) { <th></th> }
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of filtered(); track u.id) {
+            <tr [class.row-inactive]="!u.isActive">
+              <td>
+                <div class="user-cell">
+                  <span class="avatar-sm">{{ initials(u.fullName) }}</span>
+                  <div>
+                    <div class="cell-title">
+                      {{ u.fullName }}
+                      @if (u.id === myId()) { <span class="you-tag">You</span> }
+                    </div>
+                    <div class="cell-sub">{{ u.email }}</div>
+                  </div>
+                </div>
+              </td>
+
+              <td>{{ u.phone || '-' }}</td>
+
+              <td>
+                @if (isAdmin()) {
+                  <select class="form-control role-select" #sel
+                          [disabled]="u.id === myId()"
+                          (change)="changeRole(u, sel)">
+                    @for (r of roles; track r) {
+                      <option [value]="r" [selected]="u.role === r">{{ r }}</option>
+                    }
+                  </select>
+                } @else {
+                  <app-status-badge [status]="u.role" />
+                }
+              </td>
+
+              <td><app-status-badge [status]="u.isActive ? 'Active' : 'Inactive'" /></td>
+              <td>{{ u.lastLoginAt ? (u.lastLoginAt | date: 'medium') : 'Never' }}</td>
+              <td>{{ u.createdAt | date: 'mediumDate' }}</td>
+
+              @if (isAdmin()) {
+                <td>
+                  <div class="row-actions">
+                    @if (u.isActive) {
+                      <button type="button" class="btn btn-ghost btn-sm" style="color: var(--danger)"
+                              [disabled]="u.id === myId()" (click)="toggleActive(u)">Deactivate</button>
+                    } @else {
+                      <button type="button" class="btn btn-ghost btn-sm" (click)="toggleActive(u)">Activate</button>
+                    }
+                  </div>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

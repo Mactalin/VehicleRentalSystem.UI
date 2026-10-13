@@ -1,0 +1,31 @@
+.loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 16px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.loader--overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  padding: 0;
+  background: rgba(255, 255, 255, .75);
+  backdrop-filter: blur(2px);
+  border-radius: inherit;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--primary-soft);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }

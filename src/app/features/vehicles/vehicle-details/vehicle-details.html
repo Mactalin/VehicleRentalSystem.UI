@@ -1,0 +1,95 @@
+<a class="back-link" routerLink="/vehicles">&larr; Back to vehicles</a>
+
+@if (loading()) {
+  <app-loading-spinner message="Loading vehicle..." />
+} @else if (vehicle(); as v) {
+
+  <app-page-header [title]="v.make + ' ' + v.model" [subtitle]="v.registrationNumber">
+    @if (canManage()) {
+      <a class="btn btn-secondary" [routerLink]="['/vehicles', v.id, 'edit']">Edit</a>
+      @if (v.isActive) {
+        <button type="button" class="btn btn-danger" (click)="remove()">Deactivate</button>
+      }
+    }
+  </app-page-header>
+
+  @if (success()) { <div class="alert alert-success" style="margin-bottom: 16px">{{ success() }}</div> }
+  @if (error()) { <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div> }
+
+  <div class="detail-layout">
+
+    <!-- Left: gallery -->
+    <div class="card">
+      <div class="gallery-main">
+        @if (currentImage(); as img) {
+          <img [src]="img.imageUrl" [alt]="v.make + ' ' + v.model" />
+        } @else {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 17h14M5 17a2 2 0 1 0 4 0M15 17a2 2 0 1 0 4 0M3 17v-5l2-5h14l2 5v5M3 12h18" />
+          </svg>
+        }
+      </div>
+
+      @if (v.images.length > 1) {
+        <div class="gallery-thumbs">
+          @for (img of v.images; track img.id; let i = $index) {
+            <button type="button" class="gallery-thumb" [class.active]="i === activeImage()"
+                    (click)="activeImage.set(i)">
+              <img [src]="img.imageUrl" alt="Vehicle photo {{ i + 1 }}" />
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Right: info -->
+    <div class="detail-stack">
+
+      <div class="card">
+        <div class="card-header">
+          <span class="detail-title">
+            {{ v.year }} &middot; {{ v.categoryName }}
+          </span>
+          <app-status-badge [status]="v.isActive ? v.status : 'Inactive'" />
+        </div>
+        <div class="card-body">
+          <dl class="spec-grid">
+            <div><dt>Registration</dt><dd>{{ v.registrationNumber }}</dd></div>
+            <div><dt>Branch</dt><dd>{{ v.branchName }}</dd></div>
+            <div><dt>Fuel type</dt><dd>{{ v.fuelType | enumLabel }}</dd></div>
+            <div><dt>Transmission</dt><dd>{{ v.transmission }}</dd></div>
+            <div><dt>Seating</dt><dd>{{ v.seatingCapacity }} seats</dd></div>
+            <div><dt>Odometer</dt><dd>{{ v.odometerKm | number }} km</dd></div>
+            <div><dt>Colour</dt><dd>{{ v.color || '-' }}</dd></div>
+            <div><dt>Make / model</dt><dd>{{ v.make }} {{ v.model }}</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      @if (canChangeStatus() && v.isActive) {
+        <div class="card">
+          <div class="card-header">Availability</div>
+          <div class="card-body status-control">
+            <label class="form-label" for="statusSel">Change status</label>
+            <select id="statusSel" class="form-control" #sel (change)="changeStatus(sel.value)">
+              @for (s of statuses; track s) {
+                <option [value]="s" [selected]="v.status === s">{{ s }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  @if (canManage()) {
+    <div class="section-gap">
+      <app-vehicle-images [vehicleId]="v.id" [images]="v.images" (changed)="load()" />
+    </div>
+  }
+
+  <div class="section-gap">
+    <app-vehicle-documents [vehicleId]="v.id" [documents]="v.documents"
+                           [canManage]="canManage()" (changed)="load()" />
+  </div>
+}

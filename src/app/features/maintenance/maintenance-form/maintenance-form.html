@@ -1,0 +1,99 @@
+<a class="back-link" routerLink="/maintenance">&larr; Back to maintenance</a>
+
+<app-page-header
+  [title]="isEdit ? 'Edit maintenance' : 'Schedule maintenance'"
+  [subtitle]="isEdit ? 'Update the scheduled job' : 'Plan a service or repair for a vehicle'" />
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else {
+  <form class="card form-wide" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="card-body">
+
+      @if (error()) {
+        <div class="alert alert-danger" style="margin-bottom: 20px">{{ error() }}</div>
+      }
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label class="form-label" for="vehicleId">Vehicle</label>
+          @if (isEdit) {
+            <input id="vehicleId" class="form-control" type="text" disabled
+                   [value]="record()?.registrationNumber ?? ''" />
+            <span class="form-hint">The vehicle can't be changed after the record is created.</span>
+          } @else {
+            <select id="vehicleId" class="form-control" formControlName="vehicleId">
+              <option [ngValue]="0" disabled>Select a vehicle</option>
+              @for (v of vehicles(); track v.id) {
+                <option [ngValue]="v.id">{{ v.registrationNumber }} &ndash; {{ v.make }} {{ v.model }}</option>
+              }
+            </select>
+            @if (f.vehicleId.touched && f.vehicleId.errors) {
+              <span class="form-error">Please choose a vehicle.</span>
+            }
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="type">Type</label>
+          <select id="type" class="form-control" formControlName="type">
+            @for (t of types; track t) {
+              <option [ngValue]="t">{{ t }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="scheduledDate">Scheduled date</label>
+          <input id="scheduledDate" class="form-control" type="date" formControlName="scheduledDate" />
+          @if (f.scheduledDate.touched && f.scheduledDate.errors) {
+            <span class="form-error">Scheduled date is required.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="cost">Estimated cost</label>
+          <div class="input-prefix">
+            <span>&#8377;</span>
+            <input id="cost" class="form-control" type="number" formControlName="cost" />
+          </div>
+          @if (f.cost.touched && f.cost.errors) {
+            <span class="form-error">Enter an amount of 0 or more.</span>
+          } @else {
+            <span class="form-hint">You enter the final cost when the job is completed.</span>
+          }
+        </div>
+
+        <div class="form-group span-2">
+          <label class="form-label" for="vendorName">
+            Vendor / garage <span class="text-muted">(optional)</span>
+          </label>
+          <input id="vendorName" class="form-control" type="text" formControlName="vendorName"
+                 placeholder="e.g. Sri Murugan Motors" />
+        </div>
+
+        <div class="form-group span-2">
+          <label class="form-label" for="description">Description</label>
+          <textarea id="description" class="form-control" formControlName="description"
+                    placeholder="e.g. 20,000 km service: oil, filters and brake check"></textarea>
+          @if (f.description.touched && f.description.errors) {
+            <span class="form-error">Please describe the work.</span>
+          }
+        </div>
+      </div>
+
+      <p class="form-hint" style="margin-top: 16px">
+        The vehicle's status changes to Maintenance only when you start the job, not when you schedule it.
+      </p>
+
+      <div class="form-actions" style="margin-top: 20px">
+        <button type="submit" class="btn btn-primary" [disabled]="saving() || form.disabled">
+          @if (saving()) { <span class="btn-spinner"></span> }
+          {{ saving() ? 'Saving...' : (isEdit ? 'Save changes' : 'Schedule') }}
+        </button>
+        <a class="btn btn-secondary" [routerLink]="isEdit ? ['/maintenance', id()] : ['/maintenance']">Cancel</a>
+      </div>
+    </div>
+  </form>
+}

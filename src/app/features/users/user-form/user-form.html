@@ -1,0 +1,82 @@
+<a class="back-link" routerLink="/users">&larr; Back to users</a>
+
+<app-page-header title="Add user" subtitle="Create an account and choose its role" />
+
+<form class="card form-wide" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="card-body">
+
+    @if (error()) {
+      <div class="alert alert-danger" style="margin-bottom: 20px">{{ error() }}</div>
+    }
+
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label class="form-label" for="fullName">Full name</label>
+        <input id="fullName" class="form-control" type="text" formControlName="fullName" />
+        @if (f.fullName.touched && f.fullName.errors) {
+          <span class="form-error">
+            {{ f.fullName.errors['required'] ? 'Full name is required.' : 'Enter at least 2 characters.' }}
+          </span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input id="email" class="form-control" type="email" formControlName="email"
+               autocomplete="off" />
+        @if (f.email.touched && f.email.errors) {
+          <span class="form-error">
+            {{ f.email.errors['required'] ? 'Email is required.' : 'Enter a valid email address.' }}
+          </span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="phone">Phone <span class="text-muted">(optional)</span></label>
+        <input id="phone" class="form-control" type="tel" formControlName="phone"
+               placeholder="+91 98765 43210" />
+        @if (f.phone.touched && f.phone.errors) {
+          <span class="form-error">Enter a valid phone number.</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="role">Role</label>
+        <select id="role" class="form-control" formControlName="role">
+          @for (r of roles; track r) {
+            <option [ngValue]="r">{{ r }}</option>
+          }
+        </select>
+        <span class="form-hint">Admin has full access. Manager manages fleet and pricing. Staff handles daily operations.</span>
+      </div>
+
+      <div class="form-group span-2">
+        <label class="form-label" for="password">Temporary password</label>
+        <div class="input-wrap">
+          <input id="password" class="form-control" formControlName="password"
+                 [type]="showPassword() ? 'text' : 'password'" autocomplete="new-password"
+                 placeholder="At least 8 characters" />
+          <button type="button" class="input-toggle" (click)="showPassword.set(!showPassword())">
+            {{ showPassword() ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+        @if (f.password.touched && f.password.errors) {
+          <span class="form-error">
+            {{ f.password.errors['required'] ? 'Password is required.' : 'Use at least 8 characters.' }}
+          </span>
+        } @else {
+          <span class="form-hint">Share it with the user and ask them to change it from My profile.</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-actions" style="margin-top: 24px">
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        @if (saving()) { <span class="btn-spinner"></span> }
+        {{ saving() ? 'Creating...' : 'Create user' }}
+      </button>
+      <a class="btn btn-secondary" routerLink="/users">Cancel</a>
+    </div>
+  </div>
+</form>

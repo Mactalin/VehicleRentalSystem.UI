@@ -1,0 +1,74 @@
+<app-page-header title="Maintenance" subtitle="Services and repairs for the fleet">
+  <a class="btn btn-primary" routerLink="/maintenance/new">+ Schedule maintenance</a>
+</app-page-header>
+
+<div class="tabs" role="tablist">
+  @for (t of tabs; track t.key) {
+    <button type="button" role="tab" class="tab" [class.active]="tab() === t.key"
+            (click)="selectTab(t.key)">{{ t.label }}</button>
+  }
+</div>
+
+<div class="card filters">
+  <div class="form-group grow">
+    <label class="form-label" for="search">Search</label>
+    <input id="search" class="form-control" type="search"
+           placeholder="Registration, description or vendor"
+           [value]="search()" (input)="search.set($any($event.target).value)" />
+  </div>
+</div>
+
+@if (error()) {
+  <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+}
+
+@if (loading()) {
+  <app-loading-spinner message="Loading records..." />
+} @else if (filtered().length === 0) {
+  <div class="card empty-state">
+    <h3>No records found</h3>
+    <p>Nothing in this tab matches. Try another tab or schedule new maintenance.</p>
+  </div>
+} @else {
+  <div class="card">
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Vehicle</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Scheduled</th>
+            <th>Completed</th>
+            <th class="num">Cost</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of filtered(); track r.id) {
+            <tr>
+              <td>
+                <a class="reg-link" [routerLink]="['/vehicles', r.vehicleId]">{{ r.registrationNumber }}</a>
+              </td>
+              <td><span class="chip">{{ r.type }}</span></td>
+              <td>
+                <div class="cell-clamp">{{ r.description }}</div>
+                @if (r.vendorName) { <div class="cell-sub">{{ r.vendorName }}</div> }
+              </td>
+              <td>{{ r.scheduledDate | date: 'mediumDate' }}</td>
+              <td>{{ r.completedDate ? (r.completedDate | date: 'mediumDate') : '-' }}</td>
+              <td class="num">{{ r.cost | currency: 'INR' : 'symbol' : '1.0-2' }}</td>
+              <td><app-status-badge [status]="r.status" /></td>
+              <td>
+                <div class="row-actions">
+                  <a class="btn btn-ghost btn-sm" [routerLink]="['/maintenance', r.id]">Open</a>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

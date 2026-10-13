@@ -1,0 +1,155 @@
+<app-page-header
+  [title]="isEdit ? 'Edit vehicle' : 'Add vehicle'"
+  [subtitle]="isEdit ? 'Update the vehicle details' : 'Register a new vehicle in the fleet'" />
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else {
+  <form class="card form-wide" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="card-body">
+
+      @if (error()) {
+        <div class="alert alert-danger" style="margin-bottom: 20px">{{ error() }}</div>
+      }
+
+      <!-- Identification -->
+      <section class="form-section">
+        <h3 class="form-section-title">Identification</h3>
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label class="form-label" for="registrationNumber">Registration number</label>
+            <input id="registrationNumber" class="form-control" type="text"
+                   formControlName="registrationNumber" placeholder="TN45AB1234"
+                   style="text-transform: uppercase" />
+            @if (f.registrationNumber.touched && f.registrationNumber.errors) {
+              <span class="form-error">Registration number is required.</span>
+            } @else {
+              <span class="form-hint">Spaces are removed automatically.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="year">Year</label>
+            <input id="year" class="form-control" type="number" formControlName="year" />
+            @if (f.year.touched && f.year.errors) {
+              <span class="form-error">Enter a year between 1990 and 2100.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="make">Make</label>
+            <input id="make" class="form-control" type="text" formControlName="make"
+                   placeholder="e.g. Toyota" />
+            @if (f.make.touched && f.make.errors) {
+              <span class="form-error">Make is required.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="model">Model</label>
+            <input id="model" class="form-control" type="text" formControlName="model"
+                   placeholder="e.g. Innova Crysta" />
+            @if (f.model.touched && f.model.errors) {
+              <span class="form-error">Model is required.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="color">Colour <span class="text-muted">(optional)</span></label>
+            <input id="color" class="form-control" type="text" formControlName="color"
+                   placeholder="e.g. Pearl White" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Classification -->
+      <section class="form-section">
+        <h3 class="form-section-title">Category and location</h3>
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label class="form-label" for="categoryId">Category</label>
+            <select id="categoryId" class="form-control" formControlName="categoryId">
+              <option [ngValue]="0" disabled>Select a category</option>
+              @for (c of categories(); track c.id) {
+                <option [ngValue]="c.id">{{ c.name }}</option>
+              }
+            </select>
+            @if (f.categoryId.touched && f.categoryId.errors) {
+              <span class="form-error">Please choose a category.</span>
+            } @else {
+              <span class="form-hint">The category decides the rental price.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="branchId">Branch</label>
+            <select id="branchId" class="form-control" formControlName="branchId">
+              <option [ngValue]="0" disabled>Select a branch</option>
+              @for (b of branches(); track b.id) {
+                <option [ngValue]="b.id">{{ b.name }} &ndash; {{ b.city }}</option>
+              }
+            </select>
+            @if (f.branchId.touched && f.branchId.errors) {
+              <span class="form-error">Please choose a branch.</span>
+            }
+          </div>
+        </div>
+      </section>
+
+      <!-- Specifications -->
+      <section class="form-section">
+        <h3 class="form-section-title">Specifications</h3>
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label class="form-label" for="fuelType">Fuel type</label>
+            <select id="fuelType" class="form-control" formControlName="fuelType">
+              @for (t of fuelTypes; track t) {
+                <option [ngValue]="t">{{ t }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="transmission">Transmission</label>
+            <select id="transmission" class="form-control" formControlName="transmission">
+              @for (t of transmissions; track t) {
+                <option [ngValue]="t">{{ t }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="seatingCapacity">Seating capacity</label>
+            <input id="seatingCapacity" class="form-control" type="number"
+                   formControlName="seatingCapacity" />
+            @if (f.seatingCapacity.touched && f.seatingCapacity.errors) {
+              <span class="form-error">Enter between 1 and 60 seats.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="odometerKm">Odometer</label>
+            <div class="input-suffix">
+              <input id="odometerKm" class="form-control" type="number" formControlName="odometerKm" />
+              <span>km</span>
+            </div>
+            @if (f.odometerKm.touched && f.odometerKm.errors) {
+              <span class="form-error">Enter a valid reading.</span>
+            }
+          </div>
+        </div>
+      </section>
+
+      <div class="form-actions" style="margin-top: 28px">
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">
+          @if (saving()) { <span class="btn-spinner"></span> }
+          {{ saving() ? 'Saving...' : (isEdit ? 'Save changes' : 'Add vehicle') }}
+        </button>
+        <a class="btn btn-secondary" [routerLink]="isEdit ? ['/vehicles', id()] : ['/vehicles']">Cancel</a>
+      </div>
+    </div>
+  </form>
+}

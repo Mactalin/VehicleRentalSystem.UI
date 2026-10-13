@@ -1,0 +1,41 @@
+<div class="auth">
+
+  <!-- Brand panel -->
+  <section class="auth__brand">
+    <div class="brand">
+      <span class="brand__logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 17h14M5 17a2 2 0 1 0 4 0M15 17a2 2 0 1 0 4 0M3 17v-5l2-5h14l2 5v5M3 12h18" />
+        </svg>
+      </span>
+      DriveEase
+    </div>
+
+    <div class="auth__pitch">
+      <h1>Run your rental fleet,<br />without the chaos.</h1>
+      <p>One place to manage vehicles, pricing, branches and maintenance.</p>
+
+      <ul>
+        @for (f of features; track f) {
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+            {{ f }}
+          </li>
+        }
+      </ul>
+    </div>
+
+    <small>© 2026 DriveEase Vehicle Rental System</small>
+  </section>
+
+  <!-- Form panel -->
+  <section class="auth__form">
+    <div class="auth__content">
+      <router-outlet />
+    </div>
+  </section>
+</div>

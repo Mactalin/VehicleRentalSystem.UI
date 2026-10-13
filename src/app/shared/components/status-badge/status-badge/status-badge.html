@@ -1,0 +1,4 @@
+<span class="badge" [attr.data-tone]="tone()">
+  <span class="badge__dot"></span>
+  {{ label() ?? (status() | enumLabel) }}
+</span>

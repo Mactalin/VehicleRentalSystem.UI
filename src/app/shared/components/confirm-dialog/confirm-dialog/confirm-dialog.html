@@ -1,0 +1,31 @@
+@if (confirm.state(); as s) {
+  <div class="backdrop" (click)="confirm.answer(false)">
+    <div class="dialog" role="alertdialog" aria-modal="true"
+         (click)="$event.stopPropagation()">
+
+      <div class="dialog__icon" [attr.data-tone]="s.tone">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+
+      <h2>{{ s.title }}</h2>
+      <p>{{ s.message }}</p>
+
+      <div class="dialog__actions">
+        <button type="button" class="btn btn-secondary" (click)="confirm.answer(false)">
+          {{ s.cancelText }}
+        </button>
+        <button type="button" class="btn"
+                [class.btn-danger]="s.tone === 'danger'"
+                [class.btn-primary]="s.tone === 'primary'"
+                (click)="confirm.answer(true)">
+          {{ s.confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

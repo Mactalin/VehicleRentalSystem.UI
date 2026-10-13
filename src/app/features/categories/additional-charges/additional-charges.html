@@ -1,0 +1,116 @@
+<a class="back-link" routerLink="/categories">&larr; Back to categories</a>
+
+<app-page-header title="Additional charges"
+                 subtitle="Fees that can be added to a rental, such as late returns or cleaning">
+  @if (!showForm()) {
+    <button type="button" class="btn btn-primary" (click)="openAdd()">+ Add charge</button>
+  }
+</app-page-header>
+
+@if (success()) { <div class="alert alert-success" style="margin-bottom: 16px">{{ success() }}</div> }
+@if (error()) { <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div> }
+
+<div class="card">
+
+  @if (showForm()) {
+    <form class="doc-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <h3 class="doc-form__title">{{ editingId() ? 'Edit charge' : 'Add charge' }}</h3>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="chargeName">Name</label>
+          <input id="chargeName" class="form-control" type="text" formControlName="name"
+                 placeholder="e.g. Late return fee" />
+          @if (f.name.touched && f.name.errors) { <span class="form-error">Name is required.</span> }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="chargeType">Type</label>
+          <select id="chargeType" class="form-control" formControlName="chargeType">
+            @for (t of chargeTypes; track t) {
+              <option [ngValue]="t">{{ t | enumLabel }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="amount">Amount</label>
+          <div class="input-prefix">
+            <span>&#8377;</span>
+            <input id="amount" class="form-control" type="number" formControlName="amount" />
+          </div>
+          @if (f.amount.touched && f.amount.errors) {
+            <span class="form-error">Enter an amount of 0 or more.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <span class="form-label">Status</span>
+          <label class="check-row" style="height: 40px">
+            <input type="checkbox" formControlName="isActive" /> Active
+          </label>
+        </div>
+
+        <div class="form-group span-2">
+          <label class="form-label" for="chargeDescription">
+            Description <span class="text-muted">(optional)</span>
+          </label>
+          <input id="chargeDescription" class="form-control" type="text" formControlName="description"
+                 placeholder="e.g. Charged per hour after the agreed return time" />
+          <span class="form-hint">Say how it is charged (per hour, per km, one-time).</span>
+        </div>
+      </div>
+
+      <div class="form-actions" style="margin-top: 20px">
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">
+          @if (saving()) { <span class="btn-spinner"></span> }
+          {{ saving() ? 'Saving...' : (editingId() ? 'Save changes' : 'Add charge') }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+      </div>
+    </form>
+  }
+
+  @if (loading()) {
+    <app-loading-spinner />
+  } @else if (charges().length === 0) {
+    <div class="empty-state">
+      <h3>No additional charges</h3>
+      <p>Add fees like late return, extra kilometres, cleaning or fuel.</p>
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Charge</th>
+            <th>Type</th>
+            <th class="num">Amount</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of charges(); track c.id) {
+            <tr [class.row-inactive]="!c.isActive">
+              <td>
+                <div class="cell-title">{{ c.name }}</div>
+                @if (c.description) { <div class="cell-sub">{{ c.description }}</div> }
+              </td>
+              <td>{{ c.chargeType | enumLabel }}</td>
+              <td class="num">{{ c.amount | currency: 'INR' : 'symbol' : '1.0-2' }}</td>
+              <td><app-status-badge [status]="c.isActive ? 'Active' : 'Inactive'" /></td>
+              <td>
+                <div class="row-actions">
+                  <button type="button" class="btn btn-ghost btn-sm" (click)="openEdit(c)">Edit</button>
+                  <button type="button" class="btn btn-ghost btn-sm" style="color: var(--danger)"
+                          (click)="remove(c)">Delete</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

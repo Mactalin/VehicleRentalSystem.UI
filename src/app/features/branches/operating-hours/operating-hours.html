@@ -1,0 +1,55 @@
+<form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="card-header">
+    Operating hours
+    <button type="button" class="btn btn-ghost btn-sm" (click)="copyMondayToAll()">
+      Copy Monday to all days
+    </button>
+  </div>
+
+  <div class="card-body">
+
+    @if (success()) { <div class="alert alert-success" style="margin-bottom: 16px">Operating hours saved.</div> }
+    @if (error()) { <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div> }
+
+    <div class="hours-head">
+      <span>Day</span>
+      <span>Closed</span>
+      <span>Opens</span>
+      <span>Closes</span>
+    </div>
+
+    <div formArrayName="days">
+      @for (row of days.controls; track $index) {
+        <div class="hours-row" [formGroup]="row" [class.hours-row--closed]="row.controls.isClosed.value">
+          <span class="hours-row__day">{{ row.controls.dayOfWeek.value }}</span>
+
+          <label class="check-row">
+            <input type="checkbox" formControlName="isClosed" /> Closed
+          </label>
+
+          <div class="form-group">
+            <input class="form-control" type="time" formControlName="openTime"
+                   [attr.aria-label]="row.controls.dayOfWeek.value + ' opening time'"
+                   [attr.disabled]="row.controls.isClosed.value ? '' : null" />
+          </div>
+
+          <div class="form-group">
+            <input class="form-control" type="time" formControlName="closeTime"
+                   [attr.aria-label]="row.controls.dayOfWeek.value + ' closing time'"
+                   [attr.disabled]="row.controls.isClosed.value ? '' : null" />
+            @if (row.errors?.['timeOrder']) {
+              <span class="form-error">Must be after opening.</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="form-actions" style="margin-top: 20px">
+      <button type="submit" class="btn btn-primary" [disabled]="saving() || form.pristine">
+        @if (saving()) { <span class="btn-spinner"></span> }
+        {{ saving() ? 'Saving...' : 'Save hours' }}
+      </button>
+    </div>
+  </div>
+</form>

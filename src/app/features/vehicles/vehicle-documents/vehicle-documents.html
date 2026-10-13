@@ -1,0 +1,122 @@
+<div class="card">
+  <div class="card-header">
+    Documents
+    @if (canManage() && !showForm()) {
+      <button type="button" class="btn btn-primary btn-sm" (click)="openAdd()">+ Add document</button>
+    }
+  </div>
+
+  @if (error() && !showForm()) {
+    <div class="alert alert-danger" style="margin: 16px 20px 0">{{ error() }}</div>
+  }
+
+  @if (showForm()) {
+    <form class="doc-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <h3 class="doc-form__title">{{ editingId() ? 'Edit document' : 'Add document' }}</h3>
+
+      @if (error()) {
+        <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+      }
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="documentType">Document type</label>
+          <select id="documentType" class="form-control" formControlName="documentType">
+            @for (t of documentTypes; track t) {
+              <option [ngValue]="t">{{ t | enumLabel }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="documentNumber">Document number</label>
+          <input id="documentNumber" class="form-control" type="text" formControlName="documentNumber"
+                 placeholder="Policy or certificate number" />
+          @if (f.documentNumber.touched && f.documentNumber.errors) {
+            <span class="form-error">Document number is required.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="issueDate">Issue date</label>
+          <input id="issueDate" class="form-control" type="date" formControlName="issueDate" />
+          @if (f.issueDate.touched && f.issueDate.errors) {
+            <span class="form-error">Issue date is required.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="expiryDate">Expiry date</label>
+          <input id="expiryDate" class="form-control" type="date" formControlName="expiryDate" />
+          @if (f.expiryDate.touched && f.expiryDate.errors) {
+            <span class="form-error">Expiry date is required.</span>
+          } @else if (f.expiryDate.touched && form.errors?.['dateOrder']) {
+            <span class="form-error">Expiry date must be after the issue date.</span>
+          }
+        </div>
+
+        <div class="form-group span-2">
+          <label class="form-label" for="fileUrl">File link <span class="text-muted">(optional)</span></label>
+          <input id="fileUrl" class="form-control" type="url" formControlName="fileUrl"
+                 placeholder="https://example.com/insurance.pdf" />
+          @if (f.fileUrl.touched && f.fileUrl.errors) {
+            <span class="form-error">Enter a valid link starting with http:// or https://</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions" style="margin-top: 20px">
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">
+          @if (saving()) { <span class="btn-spinner"></span> }
+          {{ saving() ? 'Saving...' : (editingId() ? 'Save changes' : 'Add document') }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+      </div>
+    </form>
+  }
+
+  @if (documents().length === 0) {
+    <div class="empty-state">
+      <h3>No documents uploaded</h3>
+      <p>Registration, insurance and pollution certificates will appear here.</p>
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Number</th>
+            <th>Issued</th>
+            <th>Expires</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of documents(); track d.id) {
+            <tr>
+              <td>{{ d.documentType | enumLabel }}</td>
+              <td>{{ d.documentNumber }}</td>
+              <td>{{ d.issueDate | date: 'mediumDate' }}</td>
+              <td>{{ d.expiryDate | date: 'mediumDate' }}</td>
+              <td><app-status-badge [status]="docState(d).status" [label]="docState(d).label" /></td>
+              <td>
+                <div class="row-actions">
+                  @if (d.fileUrl) {
+                    <a class="btn btn-ghost btn-sm" [href]="d.fileUrl" target="_blank" rel="noopener">View</a>
+                  }
+                  @if (canManage()) {
+                    <button type="button" class="btn btn-ghost btn-sm" (click)="openEdit(d)">Edit</button>
+                    <button type="button" class="btn btn-ghost btn-sm" style="color: var(--danger)"
+                            (click)="remove(d)">Delete</button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

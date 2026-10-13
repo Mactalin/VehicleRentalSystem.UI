@@ -1,0 +1,82 @@
+<div class="card auth-card">
+  <div class="card-body">
+    <h2 class="auth-card__title">Create your account</h2>
+    <p class="auth-card__sub">Register to browse vehicles and book rentals.</p>
+
+    @if (error()) {
+      <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+    }
+
+    <form class="form-stack" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+
+      <div class="form-group">
+        <label class="form-label" for="fullName">Full name</label>
+        <input id="fullName" class="form-control" type="text" formControlName="fullName"
+               placeholder="Your full name" autocomplete="name" />
+        @if (f.fullName.touched && f.fullName.errors) {
+          <span class="form-error">
+            {{ f.fullName.errors['required'] ? 'Full name is required.' : 'Enter at least 2 characters.' }}
+          </span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input id="email" class="form-control" type="email" formControlName="email"
+               placeholder="you@example.com" autocomplete="email" />
+        @if (f.email.touched && f.email.errors) {
+          <span class="form-error">
+            {{ f.email.errors['required'] ? 'Email is required.' : 'Enter a valid email address.' }}
+          </span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="phone">Phone <span class="text-muted">(optional)</span></label>
+        <input id="phone" class="form-control" type="tel" formControlName="phone"
+               placeholder="+91 98765 43210" autocomplete="tel" />
+        @if (f.phone.touched && f.phone.errors) {
+          <span class="form-error">Enter a valid phone number.</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <div class="input-wrap">
+          <input id="password" class="form-control" formControlName="password"
+                 [type]="showPassword() ? 'text' : 'password'"
+                 placeholder="At least 8 characters" autocomplete="new-password" />
+          <button type="button" class="input-toggle" (click)="showPassword.set(!showPassword())">
+            {{ showPassword() ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+        @if (f.password.touched && f.password.errors) {
+          <span class="form-error">
+            {{ f.password.errors['required'] ? 'Password is required.' : 'Use at least 8 characters.' }}
+          </span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="confirmPassword">Confirm password</label>
+        <input id="confirmPassword" class="form-control" formControlName="confirmPassword"
+               [type]="showPassword() ? 'text' : 'password'"
+               placeholder="Re-enter your password" autocomplete="new-password" />
+        @if (f.confirmPassword.touched && f.confirmPassword.errors?.['required']) {
+          <span class="form-error">Please confirm your password.</span>
+        } @else if (f.confirmPassword.touched && form.errors?.['mismatch']) {
+          <span class="form-error">Passwords do not match.</span>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="loading()">
+        @if (loading()) { <span class="btn-spinner"></span> }
+        {{ loading() ? 'Creating account...' : 'Create account' }}
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      Already have an account? <a routerLink="/login">Sign in</a>
+    </p>
+  </div>
+</div>

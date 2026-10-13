@@ -1,0 +1,123 @@
+<a class="back-link" routerLink="/maintenance">&larr; Back to maintenance</a>
+
+@if (loading()) {
+  <app-loading-spinner message="Loading record..." />
+} @else if (record(); as r) {
+
+  <app-page-header [title]="r.type + ' - ' + r.registrationNumber" subtitle="Maintenance record">
+    <app-status-badge [status]="r.status" />
+  </app-page-header>
+
+  @if (success()) { <div class="alert alert-success" style="margin-bottom: 16px">{{ success() }}</div> }
+  @if (error()) { <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div> }
+
+  <div class="detail-layout">
+
+    <!-- Left: details -->
+    <div class="card">
+      <div class="card-header">Job details</div>
+      <div class="card-body">
+        <dl class="spec-grid">
+          <div>
+            <dt>Vehicle</dt>
+            <dd><a class="reg-link" [routerLink]="['/vehicles', r.vehicleId]">{{ r.registrationNumber }}</a></dd>
+          </div>
+          <div><dt>Type</dt><dd>{{ r.type }}</dd></div>
+          <div><dt>Scheduled</dt><dd>{{ r.scheduledDate | date: 'mediumDate' }}</dd></div>
+          <div>
+            <dt>Completed</dt>
+            <dd>{{ r.completedDate ? (r.completedDate | date: 'mediumDate') : '-' }}</dd>
+          </div>
+          <div><dt>Vendor</dt><dd>{{ r.vendorName || '-' }}</dd></div>
+          <div>
+            <dt>{{ r.status === 'Completed' ? 'Final cost' : 'Estimated cost' }}</dt>
+            <dd>{{ r.cost | currency: 'INR' : 'symbol' : '1.0-2' }}</dd>
+          </div>
+        </dl>
+
+        <div class="description-box">
+          <h4>Description</h4>
+          <p>{{ r.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: actions and cost -->
+    <div class="detail-stack">
+
+      @if (r.status === 'Scheduled' || r.status === 'InProgress') {
+        <div class="card">
+          <div class="card-header">Actions</div>
+
+          @if (showComplete()) {
+            <form class="doc-form" [formGroup]="completeForm" (ngSubmit)="complete()" novalidate>
+              <h3 class="doc-form__title">Complete this job</h3>
+
+              <div class="form-stack">
+                <div class="form-group">
+                  <label class="form-label" for="completedDate">Completed on</label>
+                  <input id="completedDate" class="form-control" type="date" formControlName="completedDate" />
+                  @if (cf.completedDate.touched && cf.completedDate.errors) {
+                    <span class="form-error">Completion date is required.</span>
+                  }
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="finalCost">Final cost</label>
+                  <div class="input-prefix">
+                    <span>&#8377;</span>
+                    <input id="finalCost" class="form-control" type="number" formControlName="cost" />
+                  </div>
+                  @if (cf.cost.touched && cf.cost.errors) {
+                    <span class="form-error">Enter an amount of 0 or more.</span>
+                  }
+                </div>
+              </div>
+
+              <div class="form-actions" style="margin-top: 16px">
+                <button type="submit" class="btn btn-primary" [disabled]="busy()">
+                  @if (busy()) { <span class="btn-spinner"></span> }
+                  Mark completed
+                </button>
+                <button type="button" class="btn btn-secondary" (click)="closeComplete()">Back</button>
+              </div>
+            </form>
+          } @else {
+            <div class="card-body action-stack">
+              @if (r.status === 'Scheduled') {
+                <button type="button" class="btn btn-primary" [disabled]="busy()" (click)="start()">
+                  Start job
+                </button>
+              }
+              <button type="button" class="btn btn-secondary" [disabled]="busy()" (click)="openComplete()">
+                Complete job
+              </button>
+              @if (r.status === 'Scheduled') {
+                <a class="btn btn-secondary" [routerLink]="['/maintenance', r.id, 'edit']">Edit</a>
+              }
+              <button type="button" class="btn btn-ghost" style="color: var(--danger)"
+                      [disabled]="busy()" (click)="cancel()">Cancel job</button>
+            </div>
+          }
+        </div>
+      }
+
+      @if (totalCost() !== null) {
+        <div class="card cost-callout">
+          <span class="cost-callout__label">Total spent on this vehicle</span>
+          <span class="cost-callout__value">{{ totalCost() | currency: 'INR' : 'symbol' : '1.0-2' }}</span>
+          <span class="form-hint">Completed jobs only.</span>
+        </div>
+      }
+
+      @if (canDelete() && r.status !== 'InProgress') {
+        <div class="card">
+          <div class="card-body">
+            <button type="button" class="btn btn-secondary btn-block" style="color: var(--danger)"
+                    (click)="remove()">Delete record</button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

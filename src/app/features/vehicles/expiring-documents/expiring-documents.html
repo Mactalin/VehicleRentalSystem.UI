@@ -1,0 +1,77 @@
+<app-page-header title="Document expiry"
+                 subtitle="Insurance, registration and pollution certificates that need attention">
+  <div class="form-group" style="flex-direction: row; align-items: center; gap: 10px">
+    <label class="form-label" for="window">Expiring within</label>
+    <select id="window" class="form-control" style="width: 140px" #sel (change)="setWindow(sel.value)">
+      @for (w of windows; track w) {
+        <option [value]="w" [selected]="withinDays() === w">{{ w }} days</option>
+      }
+    </select>
+  </div>
+</app-page-header>
+
+@if (error()) {
+  <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+}
+
+@if (loading()) {
+  <app-loading-spinner message="Checking documents..." />
+} @else {
+
+  <div class="stat-grid">
+    <div class="card stat-card stat-card--danger">
+      <span class="stat-card__label">Already expired</span>
+      <span class="stat-card__value">{{ expiredCount() }}</span>
+    </div>
+    <div class="card stat-card stat-card--warning">
+      <span class="stat-card__label">Expiring in {{ withinDays() }} days</span>
+      <span class="stat-card__value">{{ soonCount() }}</span>
+    </div>
+    <div class="card stat-card stat-card--primary">
+      <span class="stat-card__label">Total needing action</span>
+      <span class="stat-card__value">{{ items().length }}</span>
+    </div>
+  </div>
+
+  @if (items().length === 0) {
+    <div class="card empty-state">
+      <h3>All documents are up to date</h3>
+      <p>Nothing is expired or expiring within the next {{ withinDays() }} days.</p>
+    </div>
+  } @else {
+    <div class="card">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Vehicle</th>
+              <th>Document</th>
+              <th>Number</th>
+              <th>Expiry date</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (d of items(); track d.documentId) {
+              <tr>
+                <td>
+                  <a class="reg-link" [routerLink]="['/vehicles', d.vehicleId]">{{ d.registrationNumber }}</a>
+                </td>
+                <td>{{ d.documentType | enumLabel }}</td>
+                <td>{{ d.documentNumber }}</td>
+                <td>{{ d.expiryDate | date: 'mediumDate' }}</td>
+                <td><app-status-badge [status]="state(d).status" [label]="state(d).label" /></td>
+                <td>
+                  <div class="row-actions">
+                    <a class="btn btn-ghost btn-sm" [routerLink]="['/vehicles', d.vehicleId]">Open vehicle</a>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+}

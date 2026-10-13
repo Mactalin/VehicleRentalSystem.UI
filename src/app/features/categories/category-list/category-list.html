@@ -1,0 +1,66 @@
+<app-page-header title="Categories & pricing" subtitle="Vehicle categories and their rental rates">
+  <a class="btn btn-secondary" routerLink="/categories/additional-charges">Additional charges</a>
+  <a class="btn btn-primary" routerLink="/categories/new">+ Add category</a>
+</app-page-header>
+
+@if (success()) { <div class="alert alert-success" style="margin-bottom: 16px">{{ success() }}</div> }
+@if (error()) { <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div> }
+
+@if (loading()) {
+  <app-loading-spinner message="Loading categories..." />
+} @else if (categories().length === 0) {
+  <div class="card empty-state">
+    <h3>No categories yet</h3>
+    <p>Create a category such as Car, SUV, Van or Bike, then set its rental rates.</p>
+  </div>
+} @else {
+  <div class="card">
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th class="num">Hourly</th>
+            <th class="num">Daily</th>
+            <th class="num">Weekly</th>
+            <th class="num">Deposit</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of categories(); track c.id) {
+            <tr [class.row-inactive]="!c.isActive">
+              <td>
+                <div class="cell-title">{{ c.name }}</div>
+                @if (c.description) { <div class="cell-sub">{{ c.description }}</div> }
+              </td>
+
+              @if (c.pricing; as p) {
+                <td class="num">{{ p.hourlyPrice | currency: 'INR' : 'symbol' : '1.0-2' }}</td>
+                <td class="num">{{ p.dailyPrice | currency: 'INR' : 'symbol' : '1.0-2' }}</td>
+                <td class="num">{{ p.weeklyPrice | currency: 'INR' : 'symbol' : '1.0-2' }}</td>
+                <td class="num">{{ p.securityDeposit | currency: 'INR' : 'symbol' : '1.0-2' }}</td>
+              } @else {
+                <td colspan="4" class="num"><span class="chip">Pricing not set</span></td>
+              }
+
+              <td><app-status-badge [status]="c.isActive ? 'Active' : 'Inactive'" /></td>
+              <td>
+                <div class="row-actions">
+                  <a class="btn btn-ghost btn-sm" [routerLink]="['/categories', c.id, 'edit']">Edit</a>
+                  @if (c.isActive) {
+                    <button type="button" class="btn btn-ghost btn-sm" style="color: var(--danger)"
+                            (click)="deactivate(c)">Deactivate</button>
+                  } @else {
+                    <button type="button" class="btn btn-ghost btn-sm" (click)="activate(c)">Activate</button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

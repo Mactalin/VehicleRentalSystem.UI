@@ -1,0 +1,94 @@
+<app-page-header title="My profile" subtitle="View and update your personal details" />
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (profile(); as user) {
+  <div class="profile-layout">
+
+    <!-- Summary -->
+    <div class="card profile-summary">
+      <div class="card-body">
+        <div class="profile-avatar">{{ initials() }}</div>
+        <h2 class="profile-name">{{ user.fullName }}</h2>
+        <p class="profile-email">{{ user.email }}</p>
+
+        <div class="profile-badges">
+          <app-status-badge [status]="user.role" />
+          <app-status-badge [status]="user.isActive ? 'Active' : 'Inactive'" />
+        </div>
+
+        <dl class="profile-meta">
+          <div>
+            <dt>Member since</dt>
+            <dd>{{ user.createdAt | date: 'mediumDate' }}</dd>
+          </div>
+          <div>
+            <dt>Last login</dt>
+            <dd>{{ user.lastLoginAt ? (user.lastLoginAt | date: 'medium') : 'First login' }}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <!-- Edit form -->
+    <div class="card">
+      <div class="card-header">Personal information</div>
+      <div class="card-body">
+
+        @if (success()) {
+          <div class="alert alert-success" style="margin-bottom: 16px">Profile updated successfully.</div>
+        }
+        @if (error()) {
+          <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+        }
+
+        <form class="form-stack" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label class="form-label" for="fullName">Full name</label>
+              <input id="fullName" class="form-control" type="text" formControlName="fullName" />
+              @if (f.fullName.touched && f.fullName.errors) {
+                <span class="form-error">
+                  {{ f.fullName.errors['required'] ? 'Full name is required.' : 'Enter at least 2 characters.' }}
+                </span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phone">Phone</label>
+              <input id="phone" class="form-control" type="tel" formControlName="phone"
+                     placeholder="+91 98765 43210" />
+              @if (f.phone.touched && f.phone.errors) {
+                <span class="form-error">Enter a valid phone number.</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="email">Email</label>
+              <input id="email" class="form-control" type="email" [value]="user.email" disabled />
+              <span class="form-hint">Email can't be changed.</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="role">Role</label>
+              <input id="role" class="form-control" type="text" [value]="user.role" disabled />
+              <span class="form-hint">Roles are managed by an administrator.</span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="saving() || form.pristine">
+              @if (saving()) { <span class="btn-spinner"></span> }
+              {{ saving() ? 'Saving...' : 'Save changes' }}
+            </button>
+            <button type="button" class="btn btn-secondary" [disabled]="form.pristine" (click)="reset()">
+              Cancel
+            </button>
+            <a class="btn btn-ghost push-right" routerLink="/change-password">Change password</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}

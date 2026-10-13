@@ -1,0 +1,106 @@
+<app-page-header title="Vehicles" subtitle="Browse and manage the rental fleet">
+  @if (canManage()) {
+    <a class="btn btn-primary" routerLink="/vehicles/new">+ Add vehicle</a>
+  }
+</app-page-header>
+
+<!-- Filters -->
+<div class="card filters">
+  <div class="form-group grow">
+    <label class="form-label" for="search">Search</label>
+    <input id="search" class="form-control" type="search" placeholder="Registration, make or model"
+           [value]="search()" (input)="search.set($any($event.target).value)" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="status">Status</label>
+    <select id="status" class="form-control" #statusSel (change)="setStatus(statusSel.value)">
+      <option value="" [selected]="status() === ''">All statuses</option>
+      @for (s of statuses; track s) {
+        <option [value]="s" [selected]="status() === s">{{ s }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="category">Category</label>
+    <select id="category" class="form-control" #catSel (change)="setCategory(catSel.value)">
+      <option value="">All categories</option>
+      @for (c of categories(); track c.id) {
+        <option [value]="c.id" [selected]="categoryId() === c.id">{{ c.name }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="branch">Branch</label>
+    <select id="branch" class="form-control" #branchSel (change)="setBranch(branchSel.value)">
+      <option value="">All branches</option>
+      @for (b of branches(); track b.id) {
+        <option [value]="b.id" [selected]="branchId() === b.id">{{ b.name }}</option>
+      }
+    </select>
+  </div>
+
+  @if (canSeeInactive()) {
+    <label class="check">
+      <input type="checkbox" [checked]="includeInactive()"
+             (change)="setInactive($any($event.target).checked)" />
+      Show inactive
+    </label>
+  }
+
+  <button type="button" class="btn btn-secondary" (click)="clearFilters()">Clear</button>
+</div>
+
+@if (error()) {
+  <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+}
+
+@if (loading()) {
+  <app-loading-spinner message="Loading vehicles..." />
+} @else if (filtered().length === 0) {
+  <div class="card empty-state">
+    <h3>No vehicles found</h3>
+    <p>Try changing the filters or the search text.</p>
+  </div>
+} @else {
+  <div class="vehicle-grid">
+    @for (v of filtered(); track v.id) {
+      <a class="card vehicle-card" [class.vehicle-card--inactive]="!v.isActive"
+         [routerLink]="['/vehicles', v.id]">
+
+        <div class="vehicle-thumb">
+          @if (v.primaryImageUrl) {
+            <img [src]="v.primaryImageUrl" [alt]="v.make + ' ' + v.model" loading="lazy" />
+          } @else {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 17h14M5 17a2 2 0 1 0 4 0M15 17a2 2 0 1 0 4 0M3 17v-5l2-5h14l2 5v5M3 12h18" />
+            </svg>
+          }
+          <app-status-badge [status]="v.isActive ? v.status : 'Inactive'" />
+        </div>
+
+        <div class="vehicle-card__body">
+          <div>
+            <h3 class="vehicle-card__title">{{ v.make }} {{ v.model }} ({{ v.year }})</h3>
+            <span class="vehicle-card__reg">{{ v.registrationNumber }}</span>
+          </div>
+
+          <div class="chips">
+            <span class="chip">{{ v.categoryName }}</span>
+            <span class="chip">{{ v.fuelType | enumLabel }}</span>
+            <span class="chip">{{ v.transmission }}</span>
+            <span class="chip">{{ v.seatingCapacity }} seats</span>
+          </div>
+        </div>
+
+        <div class="vehicle-card__foot">
+          <span>{{ v.branchName }}</span>
+          <span>{{ v.odometerKm | number }} km</span>
+        </div>
+      </a>
+    }
+  </div>
+}

@@ -1,0 +1,75 @@
+<a class="back-link" routerLink="/categories">&larr; Back to categories</a>
+
+<app-page-header
+  [title]="isEdit ? 'Edit category' : 'Add category'"
+  [subtitle]="isEdit ? 'Update the category, its rates and seasonal pricing'
+                     : 'Create a vehicle category, then set its rental rates'" />
+
+@if (loading()) {
+  <app-loading-spinner />
+} @else {
+  <div class="form-wide">
+
+    <form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="card-header">Category details</div>
+      <div class="card-body">
+
+        @if (success()) { <div class="alert alert-success" style="margin-bottom: 16px">{{ success() }}</div> }
+        @if (error()) { <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div> }
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="name">Name</label>
+            <input id="name" class="form-control" type="text" formControlName="name"
+                   placeholder="e.g. SUV" />
+            @if (f.name.touched && f.name.errors) {
+              <span class="form-error">Category name is required.</span>
+            }
+          </div>
+
+          @if (isEdit) {
+            <div class="form-group">
+              <span class="form-label">Status</span>
+              <label class="check-row" style="height: 40px">
+                <input type="checkbox" formControlName="isActive" /> Active
+              </label>
+            </div>
+          }
+
+          <div class="form-group span-2">
+            <label class="form-label" for="description">
+              Description <span class="text-muted">(optional)</span>
+            </label>
+            <textarea id="description" class="form-control" formControlName="description"
+                      placeholder="e.g. SUVs and MUVs"></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 20px">
+          <button type="submit" class="btn btn-primary"
+                  [disabled]="saving() || (isEdit && form.pristine)">
+            @if (saving()) { <span class="btn-spinner"></span> }
+            {{ saving() ? 'Saving...' : (isEdit ? 'Save changes' : 'Create category') }}
+          </button>
+          <a class="btn btn-secondary" routerLink="/categories">{{ isEdit ? 'Back' : 'Cancel' }}</a>
+        </div>
+      </div>
+    </form>
+
+    @if (isEdit && category(); as c) {
+      @if (!c.pricing) {
+        <div class="alert alert-info section-gap">
+          Set the base pricing below. Vehicles in this category can't be quoted until it exists.
+        </div>
+      }
+
+      <div class="section-gap">
+        <app-pricing-form [categoryId]="c.id" [pricing]="c.pricing ?? null" (changed)="reload()" />
+      </div>
+
+      <div class="section-gap">
+        <app-seasonal-pricing [categoryId]="c.id" />
+      </div>
+    }
+  </div>
+}

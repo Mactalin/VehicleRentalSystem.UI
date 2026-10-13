@@ -1,0 +1,6 @@
+<div class="loader" [class.loader--overlay]="overlay()" role="status" aria-live="polite">
+  <span class="spinner"></span>
+  @if (message()) {
+    <p>{{ message() }}</p>
+  }
+</div>

@@ -1,0 +1,58 @@
+<div class="card">
+  <div class="card-header">Photos</div>
+  <div class="card-body">
+
+    @if (error()) {
+      <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+    }
+
+    @if (images().length === 0) {
+      <p class="text-muted" style="margin-bottom: 20px">
+        No photos yet. The first photo you add becomes the main photo.
+      </p>
+    } @else {
+      <div class="image-grid">
+        @for (img of images(); track img.id) {
+          <div class="image-tile" [class.image-tile--primary]="img.isPrimary">
+            <div class="image-tile__img">
+              <img [src]="img.imageUrl" alt="Vehicle photo" loading="lazy" />
+              @if (img.isPrimary) {
+                <app-status-badge status="Active" label="Main photo" />
+              }
+            </div>
+            <div class="image-tile__actions">
+              @if (!img.isPrimary) {
+                <button type="button" class="btn btn-ghost btn-sm" [disabled]="busy()"
+                        (click)="setPrimary(img)">Set main</button>
+              } @else {
+                <span></span>
+              }
+              <button type="button" class="btn btn-ghost btn-sm" style="color: var(--danger)"
+                      [disabled]="busy()" (click)="remove(img)">Delete</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <form class="inline-form" [formGroup]="form" (ngSubmit)="add()" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="imageUrl">Image URL</label>
+        <input id="imageUrl" class="form-control" type="url" formControlName="imageUrl"
+               placeholder="https://example.com/photo.jpg" />
+        @if (f.imageUrl.touched && f.imageUrl.errors) {
+          <span class="form-error">Enter a valid link starting with http:// or https://</span>
+        }
+      </div>
+
+      <label class="check">
+        <input type="checkbox" formControlName="isPrimary" /> Make main photo
+      </label>
+
+      <button type="submit" class="btn btn-primary" [disabled]="busy()">
+        @if (busy()) { <span class="btn-spinner"></span> }
+        Add photo
+      </button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,115 @@
+<div class="card">
+  <div class="card-header">
+    Seasonal pricing
+    @if (!showForm()) {
+      <button type="button" class="btn btn-primary btn-sm" (click)="openAdd()">+ Add season</button>
+    }
+  </div>
+
+  @if (error() && !showForm()) {
+    <div class="alert alert-danger" style="margin: 16px 20px 0">{{ error() }}</div>
+  }
+
+  @if (showForm()) {
+    <form class="doc-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <h3 class="doc-form__title">{{ editingId() ? 'Edit season' : 'Add season' }}</h3>
+
+      @if (error()) { <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div> }
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="seasonName">Season name</label>
+          <input id="seasonName" class="form-control" type="text" formControlName="name"
+                 placeholder="e.g. Pongal week" />
+          @if (f.name.touched && f.name.errors) { <span class="form-error">Season name is required.</span> }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="multiplier">Price multiplier</label>
+          <input id="multiplier" class="form-control" type="number" step="0.01" formControlName="multiplier" />
+          @if (f.multiplier.touched && f.multiplier.errors) {
+            <span class="form-error">Enter a value between 0.1 and 10.</span>
+          } @else {
+            <span class="form-hint">
+              Prices will be {{ percent(f.multiplier.value) }} during this season (1.25 = 25% higher, 0.9 = 10% lower).
+            </span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="startDate">Start date</label>
+          <input id="startDate" class="form-control" type="date" formControlName="startDate" />
+          @if (f.startDate.touched && f.startDate.errors) { <span class="form-error">Start date is required.</span> }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="endDate">End date</label>
+          <input id="endDate" class="form-control" type="date" formControlName="endDate" />
+          @if (f.endDate.touched && f.endDate.errors) {
+            <span class="form-error">End date is required.</span>
+          } @else if (f.endDate.touched && form.errors?.['dateOrder']) {
+            <span class="form-error">End date can't be before the start date.</span>
+          }
+        </div>
+
+        <label class="check-row span-2">
+          <input type="checkbox" formControlName="isActive" /> Active
+        </label>
+      </div>
+
+      <div class="form-actions" style="margin-top: 20px">
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">
+          @if (saving()) { <span class="btn-spinner"></span> }
+          {{ saving() ? 'Saving...' : (editingId() ? 'Save changes' : 'Add season') }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+      </div>
+    </form>
+  }
+
+  @if (seasons().length === 0) {
+    <div class="empty-state">
+      <h3>No seasonal pricing</h3>
+      <p>Add peak or festival seasons to raise or lower the price for specific dates.</p>
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Season</th>
+            <th>Period</th>
+            <th>Multiplier</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of seasons(); track s.id) {
+            <tr>
+              <td class="cell-title">{{ s.name }}</td>
+              <td>{{ s.startDate | date: 'mediumDate' }} &ndash; {{ s.endDate | date: 'mediumDate' }}</td>
+              <td>
+                <span class="multiplier">{{ s.multiplier | number: '1.0-2' }}&times;
+                  <small>{{ percent(s.multiplier) }}</small>
+                </span>
+              </td>
+              <td><app-status-badge [status]="s.isActive ? 'Active' : 'Inactive'" /></td>
+              <td>
+                <div class="row-actions">
+                  <button type="button" class="btn btn-ghost btn-sm" (click)="openEdit(s)">Edit</button>
+                  <button type="button" class="btn btn-ghost btn-sm" style="color: var(--danger)"
+                          (click)="remove(s)">Delete</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="form-hint" style="padding: 12px 20px 16px">
+      If two seasons overlap, the higher multiplier applies on those days.
+    </p>
+  }
+</div>

@@ -1,0 +1,90 @@
+<div class="shell">
+
+  <!-- ================= Sidebar ================= -->
+  <aside class="sidebar" [class.sidebar--open]="menuOpen()">
+    <a class="brand" routerLink="/" (click)="closeMenu()">
+      <span class="brand__logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path [attr.d]="icons.car" />
+        </svg>
+      </span>
+      <span class="brand__text">
+        <strong>DriveEase</strong>
+        <small>Rental Management</small>
+      </span>
+    </a>
+
+    <nav class="nav">
+      @for (group of groups(); track group.label) {
+        <p class="nav__label">{{ group.label }}</p>
+
+        @for (item of group.items; track item.path) {
+          <a class="nav__link" [routerLink]="item.path"
+             [class.active]="isActive(item)" (click)="closeMenu()">
+            <svg class="nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path [attr.d]="item.icon" />
+            </svg>
+            {{ item.label }}
+          </a>
+        }
+      }
+    </nav>
+
+    <div class="sidebar__footer">
+      <a class="nav__link" routerLink="/profile" [class.active]="url().startsWith('/profile')"
+         (click)="closeMenu()">
+        <svg class="nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path [attr.d]="icons.user" />
+        </svg>
+        My profile
+      </a>
+      <button type="button" class="nav__link nav__link--button" (click)="logout()">
+        <svg class="nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path [attr.d]="icons.logout" />
+        </svg>
+        Sign out
+      </button>
+    </div>
+  </aside>
+
+  @if (menuOpen()) {
+    <div class="scrim" (click)="closeMenu()"></div>
+  }
+
+  <!-- ================= Main area ================= -->
+  <div class="main">
+    <header class="topbar">
+      <button type="button" class="topbar__menu" aria-label="Open menu" (click)="toggleMenu()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path [attr.d]="icons.menu" />
+        </svg>
+      </button>
+
+      <p class="topbar__greeting">
+        Welcome back, <strong>{{ firstName() }}</strong>
+      </p>
+
+      @if (auth.user(); as user) {
+        <a class="user-chip" routerLink="/profile">
+          <span class="user-chip__avatar">{{ initials() }}</span>
+          <span class="user-chip__info">
+            <span class="user-chip__name">{{ user.fullName }}</span>
+            <app-status-badge [status]="user.role" />
+          </span>
+        </a>
+      }
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+
+<!-- Mounted once; any component can open it through ConfirmService -->
+<app-confirm-dialog />
