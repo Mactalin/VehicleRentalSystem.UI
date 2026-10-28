@@ -6,3 +6,15 @@ export type MaintenanceType = 'Service' | 'Repair';
 export type MaintenanceStatus = 'Scheduled' | 'InProgress' | 'Completed' | 'Cancelled';
 export type AdditionalChargeType = 'LateFee' | 'ExtraKm' | 'Cleaning' | 'Fuel' | 'Damage' | 'Other';
 export type RoleName = 'Admin' | 'Manager' | 'Staff' | 'Customer';
+// ---- Rental module (Mac) ----
+export type BookingStatus = 'Pending' | 'Confirmed' | 'PickedUp' | 'Returned' | 'Completed' | 'Cancelled' | 'Expired';
+export type RateType = 'Hourly' | 'Daily';
+export type InspectionType = 'Pickup' | 'Return';
+export type PaymentType = 'Advance' | 'Full' | 'SecurityDeposit' | 'LateFee' | 'DamageCharge';
+export type PaymentMethod = 'Card' | 'Upi' | 'NetBanking' | 'Cash';
+export type PaymentStatus = 'Pending' | 'Success' | 'Failed' | 'Refunded';
+export type RefundStatus = 'Pending' | 'Processed' | 'Failed';
+export type InvoiceStatus = 'Draft' | 'Issued' | 'Paid';
+export type CustomerStatus = 'Active' | 'Suspended' | 'Blocked';
+export type VerificationStatus = 'Pending' | 'Verified' | 'Rejected';
+export type KycDocumentType = 'Aadhaar' | 'Passport' | 'VoterId' | 'PanCard';

@@ -1,0 +1,185 @@
+<a class="back-link" routerLink="/customers">&larr; Back to customers</a>
+
+@if (loading()) {
+  <app-loading-spinner message="Loading customer..." />
+} @else if (customer(); as c) {
+
+  <app-page-header [title]="c.fullName" subtitle="Review documents and manage this account">
+    <app-status-badge [status]="c.verificationStatus" />
+    <app-status-badge [status]="c.status" />
+  </app-page-header>
+
+  @if (error()) {
+    <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+  }
+
+  <div class="detail-layout">
+
+    <!-- Left: personal details and account status -->
+    <div class="detail-stack">
+      <div class="card">
+        <div class="card-header">Personal details</div>
+        <div class="card-body">
+          <dl class="spec-grid">
+            <div><dt>Phone</dt><dd>{{ c.phone }}</dd></div>
+            <div><dt>Date of birth</dt><dd>{{ c.dateOfBirth | date:'d MMM y' }}</dd></div>
+            <div class="span-2" style="grid-column: 1 / -1"><dt>Address</dt><dd>{{ c.address }}</dd></div>
+            <div><dt>City</dt><dd>{{ c.city }}</dd></div>
+            <div><dt>State</dt><dd>{{ c.state }}</dd></div>
+            <div><dt>Postal code</dt><dd>{{ c.postalCode }}</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      @if (isAdmin()) {
+        <div class="card">
+          <div class="card-header">Account status</div>
+          <div class="card-body">
+            <div class="status-control">
+              <select class="form-control" #statusSel (change)="newStatus = $any(statusSel.value)">
+                @for (s of statuses; track s) {
+                  <option [value]="s" [selected]="c.status === s">{{ s }}</option>
+                }
+              </select>
+              <button type="button" class="btn btn-secondary btn-sm" [disabled]="busy()"
+                      (click)="newStatus.set($any(statusSel.value)); applyStatus()">
+                Apply
+              </button>
+            </div>
+            <p class="form-hint mt-16">Suspended and blocked customers cannot make new bookings.</p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Right: documents -->
+    <div class="detail-stack">
+
+      <div class="card">
+        <div class="card-header">Identity documents</div>
+
+        @if (c.kycDocuments.length === 0) {
+          <div class="empty-state"><p>No ID documents uploaded.</p></div>
+        } @else {
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Document</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                @for (d of c.kycDocuments; track d.id) {
+                  <tr>
+                    <td>
+                      <div class="cell-title">{{ d.documentType | enumLabel }}</div>
+                      <div class="cell-sub">{{ d.documentNumber }}</div>
+                      <div class="cell-sub">
+                        @if (isUrl(d.filePath)) {
+                          <a [href]="d.filePath" target="_blank" rel="noopener">Open file</a>
+                        } @else {
+                          {{ d.filePath }}
+                        }
+                      </div>
+                    </td>
+                    <td>
+                      <app-status-badge [status]="d.status" />
+                      @if (d.rejectionReason) {
+                        <p class="reason-note">{{ d.rejectionReason }}</p>
+                      }
+                    </td>
+                    
+                                  <select class="form-control" #statusSel
+                      (change)="newStatus.set($any(statusSel.value))">
+                @for (s of statuses; track s) {
+                  <option [value]="s" [selected]="c.status === s">{{ s }}</option>
+                }
+              </select>
+              <button type="button" class="btn btn-secondary btn-sm" [disabled]="busy()"
+                      (click)="applyStatus()">
+                Apply
+              </button>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+
+      <div class="card">
+        <div class="card-header">Driving licences</div>
+
+        @if (c.drivingLicences.length === 0) {
+          <div class="empty-state"><p>No licence uploaded.</p></div>
+        } @else {
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Licence</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                @for (d of c.drivingLicences; track d.id) {
+                  <tr>
+                    <td>
+                      <div class="cell-title">{{ d.licenceNumber }}</div>
+                      <div class="cell-sub">{{ d.issuingAuthority }} &middot; {{ d.vehicleClasses }}</div>
+                      <div class="cell-sub">
+                        Valid {{ d.issueDate | date:'d MMM y' }} &ndash; {{ d.expiryDate | date:'d MMM y' }}
+                      </div>
+                      <div class="cell-sub">
+                        @if (isUrl(d.filePath)) {
+                          <a [href]="d.filePath" target="_blank" rel="noopener">Open file</a>
+                        } @else {
+                          {{ d.filePath }}
+                        }
+                      </div>
+                    </td>
+                    <td>
+                      <app-status-badge [status]="d.status" />
+                      @if (d.rejectionReason) {
+                        <p class="reason-note">{{ d.rejectionReason }}</p>
+                      }
+                    </td>
+                    <td>
+                      @if (d.status === 'Pending') {
+                        <div class="row-actions">
+                          <button type="button" class="btn btn-primary btn-sm" [disabled]="busy()"
+                                  (click)="approve('licence', d.id, 'Licence ' + d.licenceNumber)">
+                            Approve
+                          </button>
+                          <button type="button" class="btn btn-secondary btn-sm" [disabled]="busy()"
+                                  (click)="startReject('licence', d.id, 'Licence ' + d.licenceNumber)">
+                            Reject
+                          </button>
+                        </div>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+
+      @if (rejecting(); as r) {
+        <div class="reject-panel">
+          <h4>Reject {{ r.label }}</h4>
+          <p class="text-muted">The customer will see this reason and can upload a corrected document.</p>
+
+          <div class="form-group">
+            <label class="form-label" for="reason">Reason</label>
+            <textarea id="reason" class="form-control" rows="3" [value]="reason()"
+                      (input)="reason.set($any($event.target).value)"
+                      placeholder="e.g. The photo is blurry. Please upload a clearer copy."></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-danger btn-sm" [disabled]="busy()" (click)="submitReject()">
+              Reject document
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" (click)="cancelReject()">Cancel</button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+} @else {
+  <div class="alert alert-danger">{{ error() ?? 'Customer not found.' }}</div>
+}

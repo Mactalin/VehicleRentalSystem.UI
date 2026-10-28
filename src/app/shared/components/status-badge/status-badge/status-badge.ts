@@ -26,7 +26,26 @@ const TONES: Record<string, Tone> = {
   Admin: 'primary',
   Manager: 'info',
   Staff: 'success',
-  Customer: 'neutral'
+  Customer: 'neutral',
+
+    // Bookings
+  Pending: 'warning',
+  Confirmed: 'info',
+  PickedUp: 'primary',
+  Returned: 'warning',
+
+  // Customers, documents, payments, invoices (Mac)
+  Verified: 'success',
+  Rejected: 'danger',
+  Suspended: 'warning',
+  Blocked: 'danger',
+  Success: 'success',
+  Failed: 'danger',
+  Refunded: 'neutral',
+  Processed: 'success',
+  Paid: 'success',
+  Draft: 'neutral',
+  Issued: 'info',
 };
 
 @Component({

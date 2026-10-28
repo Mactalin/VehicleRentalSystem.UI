@@ -1,0 +1,157 @@
+<app-page-header title="Find a vehicle"
+                 subtitle="Pick your dates to see what is available and what it costs" />
+
+<form class="card filters" [formGroup]="form" (ngSubmit)="search()">
+  <div class="form-group">
+    <label class="form-label" for="from">Pickup</label>
+    <input id="from" class="form-control" type="datetime-local" formControlName="from" [min]="minDate" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="to">Return</label>
+    <input id="to" class="form-control" type="datetime-local" formControlName="to" [min]="minDate" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="branchId">Branch</label>
+    <select id="branchId" class="form-control" formControlName="branchId">
+      <option [ngValue]="0">All branches</option>
+      @for (b of branches(); track b.id) {
+        <option [ngValue]="b.id">{{ b.name }} &ndash; {{ b.city }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="categoryId">Category</label>
+    <select id="categoryId" class="form-control" formControlName="categoryId">
+      <option [ngValue]="0">All categories</option>
+      @for (c of categories(); track c.id) {
+        <option [ngValue]="c.id">{{ c.name }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="fuelType">Fuel</label>
+    <select id="fuelType" class="form-control" formControlName="fuelType">
+      <option [ngValue]="''">Any</option>
+      @for (t of fuelTypes; track t) {
+        <option [ngValue]="t">{{ t }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="transmission">Transmission</label>
+    <select id="transmission" class="form-control" formControlName="transmission">
+      <option [ngValue]="''">Any</option>
+      @for (t of transmissions; track t) {
+        <option [ngValue]="t">{{ t }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="minSeatingCapacity">Min seats</label>
+    <input id="minSeatingCapacity" class="form-control" type="number" min="1"
+           formControlName="minSeatingCapacity" placeholder="Any" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="minPrice">Min price / day</label>
+    <div class="input-prefix">
+      <span>&#8377;</span>
+      <input id="minPrice" class="form-control" type="number" min="0" formControlName="minPrice" />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="maxPrice">Max price / day</label>
+    <div class="input-prefix">
+      <span>&#8377;</span>
+      <input id="maxPrice" class="form-control" type="number" min="0" formControlName="maxPrice" />
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary" [disabled]="loading()">Search</button>
+  <button type="button" class="btn btn-secondary" (click)="clear()">Clear</button>
+</form>
+
+@if (error()) {
+  <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+}
+
+@if (loading()) {
+  <app-loading-spinner message="Searching vehicles..." />
+} @else if (results().length === 0) {
+  <div class="card empty-state">
+    <h3>No vehicles found</h3>
+    <p>Try different dates, or remove some of the filters.</p>
+  </div>
+} @else {
+  <p class="results-meta">
+    {{ totalCount() }} vehicle{{ totalCount() === 1 ? '' : 's' }}
+    @if (searched().from) { available for your dates }
+  </p>
+
+  <div class="vehicle-grid">
+    @for (v of results(); track v.vehicleId) {
+      <a class="card vehicle-card" [routerLink]="['/search', v.vehicleId]" [queryParams]="detailQuery()">
+
+        <div class="vehicle-thumb">
+          @if (v.imageUrl) {
+            <img [src]="v.imageUrl" [alt]="v.make + ' ' + v.model" loading="lazy" />
+          } @else {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 17h14M5 17a2 2 0 1 0 4 0M15 17a2 2 0 1 0 4 0M3 17v-5l2-5h14l2 5v5M3 12h18" />
+            </svg>
+          }
+        </div>
+
+        <div class="vehicle-card__body">
+          <div>
+            <h3 class="vehicle-card__title">{{ v.make }} {{ v.model }} ({{ v.year }})</h3>
+            <span class="text-muted">{{ v.categoryName }}</span>
+          </div>
+
+          <div class="chips">
+            <span class="chip">{{ v.fuelType }}</span>
+            <span class="chip">{{ v.transmission }}</span>
+            <span class="chip">{{ v.seatingCapacity }} seats</span>
+            @if (v.seasonalMultiplier && v.seasonalMultiplier > 1) {
+              <span class="chip">Seasonal pricing</span>
+            }
+          </div>
+        </div>
+
+        <div class="vehicle-card__foot">
+          <span>{{ v.branchName }}, {{ v.branchCity }}</span>
+
+          @if (v.quote) {
+            <span class="vehicle-card__price">
+              <strong>{{ v.quote.totalAmount | currency:'INR':'symbol':'1.0-0' }}</strong>
+              total incl. GST
+            </span>
+          } @else {
+            <span class="vehicle-card__price">
+              <strong>{{ v.dailyRate | currency:'INR':'symbol':'1.0-0' }}</strong>
+              per day
+            </span>
+          }
+        </div>
+      </a>
+    }
+  </div>
+
+  @if (totalPages() > 1) {
+    <div class="pager">
+      <button type="button" class="btn btn-secondary btn-sm" [disabled]="page() <= 1"
+              (click)="goTo(page() - 1)">Previous</button>
+      <span class="pager__info">Page {{ page() }} of {{ totalPages() }}</span>
+      <button type="button" class="btn btn-secondary btn-sm" [disabled]="page() >= totalPages()"
+              (click)="goTo(page() + 1)">Next</button>
+    </div>
+  }
+}

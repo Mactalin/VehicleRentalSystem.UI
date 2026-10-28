@@ -22,3 +22,5 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     })
   );
 };
+
+export const errorInterceptorInterceptor = errorInterceptor;

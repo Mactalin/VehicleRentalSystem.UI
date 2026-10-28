@@ -1,0 +1,104 @@
+<a class="back-link" [routerLink]="['/bookings', id()]">&larr; Back to booking</a>
+
+<app-page-header title="Vehicle return" subtitle="Inspect the vehicle and work out any extra charges" />
+
+@if (loading()) {
+  <app-loading-spinner message="Loading booking..." />
+} @else if (booking(); as b) {
+
+  <div class="card" style="margin-bottom: 20px">
+    <div class="card-body">
+      <div class="quote-vehicle">
+        <div>
+          <h3>{{ b.vehicleName }} &middot; {{ b.vehicleRegistration }}</h3>
+          <p class="text-muted">{{ b.bookingNumber }} &middot; {{ b.customerName }}</p>
+        </div>
+        <app-status-badge [status]="result()?.status ?? b.status" />
+      </div>
+
+      <dl class="spec-grid">
+        <div><dt>Due back</dt><dd>{{ b.endAt | date:'EEE, d MMM y, h:mm a' }}</dd></div>
+        <div><dt>Picked up</dt><dd>{{ b.actualPickupAt | date:'d MMM y, h:mm a' }}</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  @if (result(); as r) {
+
+    <!-- After the return is saved -->
+    <div class="alert alert-success" style="margin-bottom: 16px">
+      The vehicle was returned on {{ r.returnedAt | date:'d MMM y, h:mm a' }}.
+    </div>
+
+    <div class="stat-grid">
+      <div class="card stat-card" [class.stat-card--warning]="r.lateFee > 0">
+        <span class="stat-card__label">Late return charge</span>
+        <span class="stat-card__value">{{ r.lateFee | currency:'INR':'symbol':'1.0-2' }}</span>
+      </div>
+      <div class="card stat-card" [class.stat-card--warning]="r.damageCharge > 0">
+        <span class="stat-card__label">Damage charge</span>
+        <span class="stat-card__value">{{ r.damageCharge | currency:'INR':'symbol':'1.0-2' }}</span>
+      </div>
+      <div class="card stat-card" [class.stat-card--danger]="r.settlement.totalDue > 0"
+           [class.stat-card--success]="r.settlement.totalDue === 0">
+        <span class="stat-card__label">Still due from the customer</span>
+        <span class="stat-card__value">{{ r.settlement.totalDue | currency:'INR':'symbol':'1.0-2' }}</span>
+      </div>
+      <div class="card stat-card stat-card--primary">
+        <span class="stat-card__label">Deposit to return</span>
+        <span class="stat-card__value">{{ r.settlement.depositToRefund | currency:'INR':'symbol':'1.0-2' }}</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        @if (r.settlement.totalDue > 0) {
+          <div class="alert alert-warning" style="margin-bottom: 16px">
+            The customer still owes {{ r.settlement.totalDue | currency:'INR':'symbol':'1.0-2' }}.
+            Take the payment, then complete the rental.
+          </div>
+        } @else {
+          <div class="alert alert-success" style="margin-bottom: 16px">
+            Nothing more is due. You can complete the rental now.
+          </div>
+        }
+
+        <div class="form-actions">
+          @if (r.settlement.totalDue > 0) {
+            <a class="btn btn-primary" [routerLink]="['/payments/booking', b.id, 'pay']">Take payment</a>
+          }
+          <a class="btn btn-secondary" [routerLink]="['/bookings', b.id]">Open booking to complete it</a>
+        </div>
+      </div>
+    </div>
+
+  } @else if (!canReturn()) {
+    <div class="alert alert-warning">
+      Only a PickedUp booking can be returned. This one is {{ b.status }}.
+    </div>
+  } @else {
+
+    @if (isLate()) {
+      <div class="alert alert-warning" style="margin-bottom: 16px">
+        This vehicle is being returned after its due time. A late charge is calculated automatically
+        once the grace period has passed.
+      </div>
+    }
+
+    @if (error()) {
+      <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+    }
+
+    <div class="card form-wide">
+      <div class="card-header">Return inspection</div>
+      <div class="card-body">
+        <app-inspection-form mode="return" submitLabel="Record return"
+                             [minOdometer]="pickupOdometer()"
+                             [saving]="saving()" (submitted)="submit($event)" />
+      </div>
+    </div>
+  }
+
+} @else {
+  <div class="alert alert-danger">{{ error() ?? 'Booking not found.' }}</div>
+}

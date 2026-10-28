@@ -1,0 +1,85 @@
+<a class="back-link" routerLink="/search">&larr; Back to search</a>
+
+<app-page-header title="Vehicle details" subtitle="Check the availability and reserve your trip" />
+
+@if (loading()) {
+  <app-loading-spinner message="Loading vehicle details..." />
+} @else if (!vehicle()) {
+  <div class="alert alert-danger">{{ error() ?? 'This vehicle is not available.' }}</div>
+} @else {
+  @let v = vehicle()!;
+
+  <div class="vehicle-detail-layout">
+    <div class="card">
+      <div class="card-body">
+        <div class="quote-vehicle">
+          <div>
+            <h2>{{ v.make }} {{ v.model }} ({{ v.year }})</h2>
+            <p class="text-muted">{{ v.categoryName }} · {{ v.branchName }}</p>
+          </div>
+        </div>
+
+        <dl class="breakdown">
+          <div class="breakdown__row">
+            <dt>Fuel</dt>
+            <dd>{{ v.fuelType }}</dd>
+          </div>
+          <div class="breakdown__row">
+            <dt>Transmission</dt>
+            <dd>{{ v.transmission }}</dd>
+          </div>
+          <div class="breakdown__row">
+            <dt>Seats</dt>
+            <dd>{{ v.seatingCapacity }}</dd>
+          </div>
+          <div class="breakdown__row">
+            <dt>Daily rate</dt>
+            <dd>{{ v.dailyRate | currency:'INR':'symbol':'1.0-2' }}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="check()">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="pickup">Pickup</label>
+              <input id="pickup" class="form-control" type="datetime-local" formControlName="from" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="return">Return</label>
+              <input id="return" class="form-control" type="datetime-local" formControlName="to" />
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary mt-16" [disabled]="checking()">
+            @if (checking()) { <span class="btn-spinner"></span> }
+            {{ checking() ? 'Checking...' : 'Check availability' }}
+          </button>
+        </form>
+
+        @if (error()) {
+          <div class="alert alert-danger mt-16">{{ error() }}</div>
+        }
+
+        @if (availability() !== null) {
+          <div class="alert mt-16" [class.alert-success]="availability()" [class.alert-warning]="!availability()">
+            {{ availability() ? 'This vehicle is available for the selected dates.' : 'This vehicle is not available for the selected dates.' }}
+          </div>
+        }
+
+        @if (quote(); as q) {
+          <div class="mt-16">
+            <app-price-breakdown [quote]="q" />
+            <button type="button" class="btn btn-primary btn-block mt-16" (click)="bookNow()">
+              Book now
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,46 @@
+<dl class="breakdown">
+  <div class="breakdown__row">
+    <dt>Rate</dt>
+    <dd>{{ quote().rateApplied | currency:'INR':'symbol':'1.0-2' }} per {{ unit() }}</dd>
+  </div>
+
+  <div class="breakdown__row">
+    <dt>Rental ({{ quote().units }} {{ unit() }}{{ quote().units === 1 ? '' : 's' }})</dt>
+    <dd>{{ quote().baseAmount | currency:'INR':'symbol':'1.0-2' }}</dd>
+  </div>
+
+  @if (quote().addOnAmount > 0) {
+    <div class="breakdown__row">
+      <dt>Add-ons</dt>
+      <dd>{{ quote().addOnAmount | currency:'INR':'symbol':'1.0-2' }}</dd>
+    </div>
+  }
+
+  @if (quote().discountAmount > 0) {
+    <div class="breakdown__row">
+      <dt>Discount</dt>
+      <dd>&minus;{{ quote().discountAmount | currency:'INR':'symbol':'1.0-2' }}</dd>
+    </div>
+  }
+
+  <div class="breakdown__row">
+    <dt>GST</dt>
+    <dd>{{ quote().taxAmount | currency:'INR':'symbol':'1.0-2' }}</dd>
+  </div>
+</dl>
+
+<div class="breakdown__total">
+  <span>Total</span>
+  <strong>{{ quote().totalAmount | currency:'INR':'symbol':'1.0-2' }}</strong>
+</div>
+
+<dl class="breakdown" style="margin-top: 16px">
+  <div class="breakdown__row breakdown__row--sub">
+    <dt>Advance to pay now</dt>
+    <dd>{{ quote().advanceAmount | currency:'INR':'symbol':'1.0-2' }}</dd>
+  </div>
+  <div class="breakdown__row">
+    <dt>Refundable security deposit</dt>
+    <dd>{{ quote().securityDeposit | currency:'INR':'symbol':'1.0-2' }}</dd>
+  </div>
+</dl>

@@ -1,0 +1,10 @@
+<ol class="timeline">
+  @for (s of steps(); track s.n) {
+    <li class="timeline__step"
+        [class.timeline__step--done]="s.state === 'done'"
+        [class.timeline__step--current]="s.state === 'current'"
+        [attr.data-n]="s.n">
+      {{ s.label }}
+    </li>
+  }
+</ol>

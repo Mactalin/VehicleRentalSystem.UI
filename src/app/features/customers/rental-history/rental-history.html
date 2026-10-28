@@ -1,0 +1,66 @@
+<app-page-header title="Rental history" subtitle="All your bookings in one place">
+  <a class="btn btn-primary" routerLink="/search">Find a vehicle</a>
+</app-page-header>
+
+@if (loading()) {
+  <app-loading-spinner message="Loading your bookings..." />
+} @else if (error()) {
+  <div class="alert alert-danger">{{ error() }}</div>
+} @else if (!hasProfile()) {
+  <div class="card empty-state">
+    <h3>Complete your rental profile first</h3>
+    <p>Your bookings will appear here once you have rented a vehicle.</p>
+    <a class="btn btn-primary" style="margin-top: 16px" routerLink="/customer/profile">Complete profile</a>
+  </div>
+} @else {
+
+  <div class="tabs">
+    @for (t of tabs; track t.key) {
+      <button type="button" class="tab" [class.active]="tab() === t.key" (click)="tab.set(t.key)">
+        {{ t.label }}
+      </button>
+    }
+  </div>
+
+  @if (filtered().length === 0) {
+    <div class="card empty-state">
+      <h3>No bookings here</h3>
+      <p>Nothing matches this tab yet.</p>
+    </div>
+  } @else {
+    <div class="card">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Booking</th>
+              <th>Vehicle</th>
+              <th>Pickup</th>
+              <th>Return</th>
+              <th>Status</th>
+              <th class="num">Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (b of filtered(); track b.id) {
+              <tr>
+                <td class="cell-title">{{ b.bookingNumber }}</td>
+                <td>{{ b.vehicleName }}</td>
+                <td>{{ b.startAt | date:'d MMM y, h:mm a' }}</td>
+                <td>{{ b.endAt | date:'d MMM y, h:mm a' }}</td>
+                <td><app-status-badge [status]="b.status" /></td>
+                <td class="num">{{ b.totalAmount | currency:'INR':'symbol':'1.0-2' }}</td>
+                <td>
+                  <div class="row-actions">
+                    <a class="btn btn-ghost btn-sm" [routerLink]="['/bookings', b.id]">View</a>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+}

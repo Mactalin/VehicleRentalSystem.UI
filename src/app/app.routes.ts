@@ -11,6 +11,54 @@ export const routes: Routes = [
     children: [
       { path: 'profile', loadChildren: () => import('./features/profile/profile.routes').then(m => m.PROFILE_ROUTES) },
       {
+        path: 'customer',
+        canActivate: [roleGuard('Customer')],
+        loadChildren: () => import('./features/customers/customers.routes').then(m => m.CUSTOMER_ROUTES)
+      },
+      {
+        path: 'customers',
+        canActivate: [roleGuard('Admin', 'Manager', 'Staff')],
+        loadChildren: () => import('./features/customers/customers.routes').then(m => m.STAFF_CUSTOMER_ROUTES)
+      },
+      {
+        path: 'search',
+        canActivate: [roleGuard('Customer')],
+        loadChildren: () => import('./features/search/search.routes').then(m => m.SEARCH_ROUTES)
+      },
+      {
+        path: 'book/:vehicleId',
+        canActivate: [roleGuard('Customer')],
+        loadComponent: () => import('./features/bookings/checkout/checkout').then(m => m.Checkout)
+      },
+      { path: 'bookings', loadChildren: () => import('./features/bookings/bookings.routes').then(m => m.BOOKING_ROUTES) },
+      {
+        path: 'payments',
+        children: [
+          {
+            path: '',
+            canActivate: [roleGuard('Customer')],
+            loadComponent: () => import('./features/payments/payment-history/payment-history').then(m => m.PaymentHistory)
+          },
+          {
+            path: 'refunds',
+            canActivate: [roleGuard('Admin', 'Manager')],
+            loadComponent: () => import('./features/payments/refund-form/refund-form').then(m => m.RefundForm)
+          },
+          {
+            path: 'booking/:bookingId/pay',
+            loadComponent: () => import('./features/payments/payment-pay/payment-pay').then(m => m.PaymentPay)
+          },
+          {
+            path: 'booking/:bookingId/settlement',
+            loadComponent: () => import('./features/payments/payment-settlement/payment-settlement').then(m => m.PaymentSettlement)
+          },
+          {
+            path: 'booking/:bookingId/invoice',
+            loadComponent: () => import('./features/payments/invoice-view/invoice-view').then(m => m.InvoiceView)
+          }
+        ]
+      },
+      {
         path: 'change-password',
         loadComponent: () =>
           import('./features/auth/change-password/change-password').then(m => m.ChangePassword)
@@ -46,6 +94,5 @@ export const routes: Routes = [
       { path: 'register', loadComponent: () => import('./features/auth/register/register').then(m => m.Register) }
     ]
   },
-
   { path: '**', redirectTo: '' }
 ];

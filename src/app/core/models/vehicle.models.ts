@@ -7,6 +7,8 @@ export interface VehicleDto {
   make: string; model: string; year: number; color?: string;
   fuelType: FuelType; transmission: TransmissionType;
   seatingCapacity: number; odometerKm: number;
+  dailyRate: number;
+  hourlyRate?: number;
   status: VehicleStatus; isActive: boolean;
   primaryImageUrl?: string;
   images: VehicleImageDto[]; documents: VehicleDocumentDto[];

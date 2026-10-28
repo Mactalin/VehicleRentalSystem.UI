@@ -1,0 +1,54 @@
+<a class="back-link" [routerLink]="['/bookings', id()]">&larr; Back to booking</a>
+
+<app-page-header title="Vehicle pickup" subtitle="Record the vehicle's condition before handing it over" />
+
+@if (loading()) {
+  <app-loading-spinner message="Loading booking..." />
+} @else if (booking(); as b) {
+
+  <div class="card" style="margin-bottom: 20px">
+    <div class="card-body">
+      <div class="quote-vehicle">
+        <div>
+          <h3>{{ b.vehicleName }} &middot; {{ b.vehicleRegistration }}</h3>
+          <p class="text-muted">{{ b.bookingNumber }} &middot; {{ b.customerName }}</p>
+        </div>
+        <app-status-badge [status]="b.status" />
+      </div>
+
+      <dl class="spec-grid">
+        <div><dt>Pickup</dt><dd>{{ b.startAt | date:'EEE, d MMM y, h:mm a' }}</dd></div>
+        <div><dt>Return</dt><dd>{{ b.endAt | date:'EEE, d MMM y, h:mm a' }}</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  @if (!canPickup()) {
+    <div class="alert alert-warning">
+      Only a Confirmed booking can be picked up. This one is {{ b.status }}.
+    </div>
+  } @else {
+
+    @if (!depositPaid()) {
+      <div class="alert alert-warning" style="margin-bottom: 16px">
+        The security deposit has not been paid, and pickup is blocked until it is.
+        <a [routerLink]="['/payments/booking', b.id, 'pay']">Take the deposit</a>
+      </div>
+    }
+
+    @if (error()) {
+      <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+    }
+
+    <div class="card form-wide">
+      <div class="card-header">Pickup inspection</div>
+      <div class="card-body">
+        <app-inspection-form mode="pickup" submitLabel="Hand over vehicle"
+                             [saving]="saving()" (submitted)="submit($event)" />
+      </div>
+    </div>
+  }
+
+} @else {
+  <div class="alert alert-danger">{{ error() ?? 'Booking not found.' }}</div>
+}

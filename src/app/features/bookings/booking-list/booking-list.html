@@ -1,0 +1,74 @@
+<app-page-header title="Bookings" subtitle="Pickups, returns and completed rentals" />
+
+<div class="tabs">
+  @for (t of tabs; track t.status) {
+    <button type="button" class="tab" [class.active]="tab() === t.status" (click)="setTab(t.status)">
+      {{ t.label }}
+    </button>
+  }
+</div>
+
+<div class="card filters">
+  <div class="form-group grow">
+    <label class="form-label" for="search">Search</label>
+    <input id="search" class="form-control" type="search"
+           placeholder="Booking number, customer or vehicle"
+           [value]="search()" (input)="search.set($any($event.target).value)" />
+  </div>
+</div>
+
+@if (error()) {
+  <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+}
+
+@if (loading()) {
+  <app-loading-spinner message="Loading bookings..." />
+} @else if (filtered().length === 0) {
+  <div class="card empty-state">
+    <h3>No bookings here</h3>
+    <p>Nothing matches this tab and search.</p>
+  </div>
+} @else {
+  <div class="card">
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Booking</th>
+            <th>Customer</th>
+            <th>Vehicle</th>
+            <th>Pickup</th>
+            <th>Return</th>
+            <th>Status</th>
+            <th class="num">Total</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (b of filtered(); track b.id) {
+            <tr>
+              <td class="cell-title">{{ b.bookingNumber }}</td>
+              <td>{{ b.customerName }}</td>
+              <td>{{ b.vehicleName }}</td>
+              <td>{{ b.startAt | date:'d MMM y, h:mm a' }}</td>
+              <td>{{ b.endAt | date:'d MMM y, h:mm a' }}</td>
+              <td><app-status-badge [status]="b.status" /></td>
+              <td class="num">{{ b.totalAmount | currency:'INR':'symbol':'1.0-2' }}</td>
+              <td>
+                <div class="row-actions">
+                  @if (b.status === 'Confirmed') {
+                    <a class="btn btn-primary btn-sm" [routerLink]="['/bookings', b.id, 'pickup']">Pickup</a>
+                  }
+                  @if (b.status === 'PickedUp') {
+                    <a class="btn btn-primary btn-sm" [routerLink]="['/bookings', b.id, 'return']">Return</a>
+                  }
+                  <a class="btn btn-secondary btn-sm" [routerLink]="['/bookings', b.id]">View</a>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

@@ -1,8 +1,141 @@
+/* ---- Booking timeline ---- */
+.timeline { display: flex; margin: 0; padding: 0; list-style: none; }
+.timeline__step {
+  position: relative;
+  flex: 1;
+  padding-top: 36px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.timeline__step::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--border);
+}
+.timeline__step:first-child::before { left: 50%; }
+.timeline__step:last-child::before { right: 50%; }
+.timeline__step::after {
+  content: attr(data-n);
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 50%;
+}
+.timeline__step--done::before { background: var(--primary); }
+.timeline__step--done::after {
+  content: '\2713';
+  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.timeline__step--current { color: var(--text); }
+.timeline__step--current::after { color: var(--primary); border-color: var(--primary); }
+/* ---- Payments module ---- */
+.stat-card--success { border-left-color: var(--success); }
+.stat-card--success .stat-card__value { color: var(--success); }
+
+.due-list { display: flex; flex-direction: column; }
+.due-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.due-row:last-child { border-bottom: none; }
+.due-row__label { font-weight: 600; }
+.due-row__note { font-size: 12px; color: var(--text-muted); }
+.due-row__pay { display: flex; align-items: center; gap: 14px; }
+.due-row__amount { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.refund-sub { margin-top: 2px; font-size: 12px; color: var(--text-muted); }
+
+/* ---- Invoice ---- */
+.invoice { max-width: 840px; margin: 0 auto; }
+.invoice__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 28px;
+  border-bottom: 1px solid var(--border);
+}
+.invoice__brand strong { font-size: 22px; }
+.invoice__meta { text-align: right; }
+.invoice__meta h2 { margin-bottom: 4px; font-size: 18px; }
+.invoice__parties {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  padding: 20px 28px;
+}
+.invoice__parties h4 {
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text-muted);
+}
+.invoice__totals { width: 300px; margin: 0 28px 28px auto; padding-top: 16px; }
+.invoice__totals div { display: flex; justify-content: space-between; padding: 6px 0; }
+.invoice__totals .grand {
+  margin-top: 6px;
+  padding-top: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  border-top: 2px solid var(--text);
+}
+
+@media (max-width: 640px) {
+  .invoice__parties { grid-template-columns: 1fr; }
+  .invoice__meta { text-align: left; }
+  .invoice__totals { width: auto; margin-left: 28px; }
+}
+
+@media print {
+  .sidebar, .topbar, .scrim, .no-print { display: none !important; }
+  .main { margin: 0 !important; padding: 0 !important; }
+  .content { padding: 0 !important; }
+  .invoice { box-shadow: none; border: none; max-width: 100%; }
+  body { background: #fff; }
+}
 /* ============================================================
    Vehicle Rental System: global theme
    Indigo primary, slate neutrals, dark navy sidebar
    ============================================================ */
 :root {
+  /* ---- Customer module ---- */
+.doc-card + .doc-card { margin-top: 20px; }
+
+.reject-panel {
+  margin-top: 20px;
+  padding: 18px 20px;
+  background: var(--danger-soft);
+  border: 1px solid #fecaca;
+  border-radius: var(--radius);
+}
+.reject-panel h4 { margin-bottom: 4px; color: #991b1b; }
+.reject-panel .form-group { margin: 12px 0; }
+
+.reason-note { margin-top: 4px; font-size: 12px; color: var(--danger); }
   /* Brand */
   --primary: #4f46e5;
   --primary-hover: #4338ca;
@@ -806,3 +939,74 @@ select.form-control { cursor: pointer; }
 @media (max-width: 960px) {
   .quote-layout { grid-template-columns: 1fr; }
 }
+/* ============================================================
+   Rental module (Mac): search, checkout, payments
+   ============================================================ */
+
+.results-meta { margin-bottom: 14px; color: var(--text-muted); }
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+.pager__info { color: var(--text-muted); font-weight: 500; }
+
+.vehicle-card__price { text-align: right; line-height: 1.3; }
+.vehicle-card__price strong { display: block; font-size: 16px; color: var(--text); }
+
+.stack { display: flex; flex-direction: column; gap: 14px; }
+.mt-16 { margin-top: 16px; }
+
+.countdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  font-weight: 600;
+  color: #92400e;
+  background: var(--warning-soft);
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-sm);
+}
+.countdown strong { font-size: 22px; font-variant-numeric: tabular-nums; }
+.countdown--urgent { color: #991b1b; background: var(--danger-soft); border-color: #fecaca; }
+
+.method-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.method {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  font-weight: 600;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.method:has(input:checked) { border-color: var(--primary); background: var(--primary-soft); }
+.method input { accent-color: var(--primary); }
+
+.success-panel { padding: 8px 0; text-align: center; }
+.success-panel__icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 14px;
+  font-size: 28px;
+  color: var(--success);
+  background: var(--success-soft);
+  border-radius: 50%;
+}
+.success-panel h3 { margin-bottom: 6px; }
+.success-panel .ref { margin: 12px 0 20px; font-weight: 700; letter-spacing: .04em; }

@@ -1,0 +1,116 @@
+<app-page-header title="Refunds" subtitle="Issue a manual refund on a payment" />
+
+<form class="card filters" (submit)="$event.preventDefault(); find()">
+  <div class="form-group">
+    <label class="form-label" for="bookingId">Booking ID</label>
+    <input id="bookingId" class="form-control" type="number" min="1" [formControl]="lookup"
+           placeholder="e.g. 12" />
+    @if (lookup.touched && lookup.invalid) {
+      <span class="form-error">Enter a booking ID.</span>
+    }
+  </div>
+  <button type="submit" class="btn btn-primary" [disabled]="loading()">Find payments</button>
+</form>
+
+@if (error()) {
+  <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+}
+@if (message()) {
+  <div class="alert alert-success" style="margin-bottom: 16px">{{ message() }}</div>
+}
+
+@if (loading()) {
+  <app-loading-spinner message="Loading payments..." />
+} @else if (searched() !== null) {
+
+  @if (payments().length === 0) {
+    <div class="card empty-state">
+      <h3>No payments on booking #{{ searched() }}</h3>
+      <p>There is nothing to refund on this booking.</p>
+    </div>
+  } @else {
+    <div class="card">
+      <div class="card-header">Payments on booking #{{ searched() }}</div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Payment</th>
+              <th>Date</th>
+              <th>Method</th>
+              <th>Status</th>
+              <th class="num">Paid</th>
+              <th class="num">Refunded</th>
+              <th class="num">Refundable</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of payments(); track p.id) {
+              <tr>
+                <td>
+                  <div class="cell-title">#{{ p.id }} &middot; {{ p.type | enumLabel }}</div>
+                  <div class="cell-sub">{{ p.gatewayReference ?? 'No reference' }}</div>
+                </td>
+                <td>{{ p.createdAt | date:'d MMM y, h:mm a' }}</td>
+                <td>{{ methodLabel(p.method) }}</td>
+                <td><app-status-badge [status]="p.status" /></td>
+                <td class="num">{{ p.amount | currency:'INR':'symbol':'1.0-2' }}</td>
+                <td class="num">{{ p.refundedAmount | currency:'INR':'symbol':'1.0-2' }}</td>
+                <td class="num">{{ refundable(p) | currency:'INR':'symbol':'1.0-2' }}</td>
+                <td>
+                  <div class="row-actions">
+                    @if (refundable(p) > 0) {
+                      <button type="button" class="btn btn-secondary btn-sm" (click)="select(p)">Refund</button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    @if (selected(); as p) {
+      <form class="card section-gap form-narrow" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="card-header">Refund payment #{{ p.id }}</div>
+        <div class="card-body stack">
+
+          <div class="form-group">
+            <label class="form-label" for="amount">Amount</label>
+            <div class="input-prefix">
+              <span>&#8377;</span>
+              <input id="amount" class="form-control" type="number" step="0.01" min="0.01"
+                     formControlName="amount" />
+            </div>
+            @if (f.amount.touched && f.amount.errors) {
+              <span class="form-error">Enter an amount greater than zero.</span>
+            } @else {
+              <span class="form-hint">
+                Up to {{ maxAmount() | currency:'INR':'symbol':'1.0-2' }} can be refunded on this payment.
+              </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reason">Reason</label>
+            <textarea id="reason" class="form-control" rows="3" formControlName="reason"
+                      placeholder="e.g. Goodwill refund after a complaint"></textarea>
+            @if (f.reason.touched && f.reason.errors) {
+              <span class="form-error">A reason is required.</span>
+            }
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-danger" [disabled]="saving()">
+              @if (saving()) { <span class="btn-spinner"></span> }
+              {{ saving() ? 'Refunding...' : 'Issue refund' }}
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+          </div>
+        </div>
+      </form>
+    }
+  }
+}

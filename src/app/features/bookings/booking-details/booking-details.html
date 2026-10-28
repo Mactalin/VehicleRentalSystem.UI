@@ -1,0 +1,291 @@
+<a class="back-link" [routerLink]="isStaff() ? '/bookings/manage' : '/customer/history'">
+  &larr; {{ isStaff() ? 'Bookings' : 'Rental history' }}
+</a>
+
+@if (loading()) {
+  <app-loading-spinner message="Loading booking..." />
+} @else if (booking(); as b) {
+
+  <app-page-header [title]="b.bookingNumber" [subtitle]="b.vehicleName + ' · ' + b.vehicleRegistration">
+    <app-status-badge [status]="b.status" />
+
+    @if (canPay()) {
+      <a class="btn btn-primary" [routerLink]="['/payments/booking', b.id, 'pay']">Pay</a>
+    }
+    @if (canPickup()) {
+      <a class="btn btn-primary" [routerLink]="['/bookings', b.id, 'pickup']">Start pickup</a>
+    }
+    @if (canReturn()) {
+      <a class="btn btn-primary" [routerLink]="['/bookings', b.id, 'return']">Process return</a>
+    }
+    @if (canComplete()) {
+      <button type="button" class="btn btn-primary" [disabled]="busy() || outstanding() > 0"
+              (click)="complete()">Complete rental</button>
+    }
+    @if (canModify()) {
+      <a class="btn btn-secondary" [routerLink]="['/bookings', b.id, 'modify']">Modify</a>
+    }
+    @if (b.status === 'Completed') {
+      <a class="btn btn-secondary" [routerLink]="['/payments/booking', b.id, 'invoice']">Invoice</a>
+    }
+    <a class="btn btn-ghost" [routerLink]="['/payments/booking', b.id, 'settlement']">Settlement</a>
+  </app-page-header>
+
+  <!-- Progress -->
+  @if (b.status === 'Cancelled' || b.status === 'Expired') {
+    <div class="alert alert-warning" style="margin-bottom: 16px">
+      @if (b.status === 'Expired') {
+        This booking expired because the advance was not paid in time.
+      } @else {
+        This booking was cancelled
+        @if (b.cancelledAt) { on {{ b.cancelledAt | date:'d MMM y' }} }.
+        @if (b.cancellationReason) { Reason: {{ b.cancellationReason }} }
+      }
+    </div>
+  } @else {
+    <div class="card" style="margin-bottom: 20px">
+      <div class="card-body"><app-booking-timeline [status]="b.status" /></div>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+  }
+  @if (message()) {
+    <div class="alert alert-success" style="margin-bottom: 16px">{{ message() }}</div>
+  }
+
+  @if (b.status === 'Pending' && b.pendingExpiresAt) {
+    @if (lapsed()) {
+      <div class="alert alert-warning" style="margin-bottom: 16px">
+        The payment window has passed. This booking will expire shortly.
+      </div>
+    } @else {
+      <div class="alert alert-info" style="margin-bottom: 16px">
+        Pay the advance before {{ b.pendingExpiresAt | date:'h:mm a' }} to keep this booking.
+      </div>
+    }
+  }
+
+  @if (b.status === 'Returned' && outstanding() > 0) {
+    <div class="alert alert-warning" style="margin-bottom: 16px">
+      {{ outstanding() | currency:'INR':'symbol':'1.0-2' }} is still due.
+      The rental can be completed once it is paid.
+      <a [routerLink]="['/payments/booking', b.id, 'pay']">Take payment</a>
+    </div>
+  }
+
+  <div class="detail-layout">
+
+    <!-- Left: trip and inspections -->
+    <div class="detail-stack">
+      <div class="card">
+        <div class="card-header">Trip</div>
+        <div class="card-body">
+          <dl class="spec-grid">
+            <div><dt>Pickup</dt><dd>{{ b.startAt | date:'EEE, d MMM y, h:mm a' }}</dd></div>
+            <div><dt>Return</dt><dd>{{ b.endAt | date:'EEE, d MMM y, h:mm a' }}</dd></div>
+            <div><dt>Pickup branch</dt><dd>{{ branchName(b.pickupBranchId) }}</dd></div>
+            <div><dt>Return branch</dt><dd>{{ branchName(b.dropBranchId) }}</dd></div>
+            <div><dt>Vehicle</dt><dd>{{ b.vehicleName }}</dd></div>
+            <div><dt>Registration</dt><dd>{{ b.vehicleRegistration }}</dd></div>
+
+            @if (isStaff()) {
+              <div>
+                <dt>Customer</dt>
+                <dd><a [routerLink]="['/customers', b.customerId]">{{ b.customerName }}</a></dd>
+              </div>
+            }
+            @if (b.actualPickupAt) {
+              <div><dt>Picked up</dt><dd>{{ b.actualPickupAt | date:'d MMM y, h:mm a' }}</dd></div>
+            }
+            @if (b.actualReturnAt) {
+              <div><dt>Returned</dt><dd>{{ b.actualReturnAt | date:'d MMM y, h:mm a' }}</dd></div>
+            }
+          </dl>
+        </div>
+      </div>
+
+      @if (b.inspections.length > 0) {
+        <div class="card">
+          <div class="card-header">Inspections</div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr><th>When</th><th class="num">Odometer</th><th class="num">Fuel</th><th>Notes</th></tr>
+              </thead>
+              <tbody>
+                @for (i of b.inspections; track i.id) {
+                  <tr>
+                    <td>
+                      <div class="cell-title">{{ i.type | enumLabel }}</div>
+                      <div class="cell-sub">{{ i.inspectedAt | date:'d MMM y, h:mm a' }}</div>
+                    </td>
+                    <td class="num">{{ i.odometerReading }} km</td>
+                    <td class="num">{{ i.fuelLevelPercent }}%</td>
+                    <td>
+                      {{ i.damageNotes || '-' }}
+                      @if (i.damageCharge > 0) {
+                        <div class="cell-sub">
+                          Damage charge {{ i.damageCharge | currency:'INR':'symbol':'1.0-2' }}
+                        </div>
+                      }
+                      @for (link of photoLinks(i.photoUrls); track link; let n = $index) {
+                        <div class="cell-sub">
+                          <a [href]="link" target="_blank" rel="noopener">Photo {{ n + 1 }}</a>
+                        </div>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Right: price and cancel -->
+    <div class="detail-stack">
+      <div class="card">
+        <div class="card-header">Price</div>
+        <div class="card-body">
+          <dl class="breakdown">
+            <div class="breakdown__row">
+              <dt>Rate</dt>
+              <dd>
+                {{ b.rateApplied | currency:'INR':'symbol':'1.0-2' }}
+                per {{ b.rateType === 'Hourly' ? 'hour' : 'day' }}
+              </dd>
+            </div>
+            <div class="breakdown__row">
+              <dt>Rental</dt>
+              <dd>{{ b.baseAmount | currency:'INR':'symbol':'1.0-2' }}</dd>
+            </div>
+            @if (b.addOnAmount > 0) {
+              <div class="breakdown__row">
+                <dt>Add-ons</dt>
+                <dd>{{ b.addOnAmount | currency:'INR':'symbol':'1.0-2' }}</dd>
+              </div>
+            }
+            @if (b.discountAmount > 0) {
+              <div class="breakdown__row">
+                <dt>Discount @if (b.couponCode) { ({{ b.couponCode }}) }</dt>
+                <dd>&minus;{{ b.discountAmount | currency:'INR':'symbol':'1.0-2' }}</dd>
+              </div>
+            }
+            <div class="breakdown__row">
+              <dt>GST</dt>
+              <dd>{{ b.taxAmount | currency:'INR':'symbol':'1.0-2' }}</dd>
+            </div>
+          </dl>
+
+          <div class="breakdown__total">
+            <span>Total</span>
+            <strong>{{ b.totalAmount | currency:'INR':'symbol':'1.0-2' }}</strong>
+          </div>
+
+          <dl class="breakdown" style="margin-top: 16px">
+            <div class="breakdown__row">
+              <dt>Advance</dt>
+              <dd>{{ b.advanceAmount | currency:'INR':'symbol':'1.0-2' }}</dd>
+            </div>
+            <div class="breakdown__row">
+              <dt>Refundable security deposit</dt>
+              <dd>{{ b.securityDeposit | currency:'INR':'symbol':'1.0-2' }}</dd>
+            </div>
+            @if (b.lateFee > 0) {
+              <div class="breakdown__row">
+                <dt>Late return charge</dt>
+                <dd>{{ b.lateFee | currency:'INR':'symbol':'1.0-2' }}</dd>
+              </div>
+            }
+            @if (b.damageCharge > 0) {
+              <div class="breakdown__row">
+                <dt>Damage charge</dt>
+                <dd>{{ b.damageCharge | currency:'INR':'symbol':'1.0-2' }}</dd>
+              </div>
+            }
+          </dl>
+        </div>
+      </div>
+
+      @if (canCancel()) {
+        @if (!cancelling()) {
+          <button type="button" class="btn btn-secondary" [disabled]="busy()" (click)="startCancel()">
+            Cancel booking
+          </button>
+        } @else if (preview(); as p) {
+          <div class="reject-panel">
+            <h4>Cancel this booking</h4>
+            <p>
+              @if (p.refundAmount > 0) {
+                You will be refunded
+                <strong>{{ p.refundAmount | currency:'INR':'symbol':'1.0-2' }}</strong>.
+              } @else {
+                No refund applies to this cancellation.
+              }
+            </p>
+
+            <div class="form-group">
+              <label class="form-label" for="cancelReason">Reason</label>
+              <textarea id="cancelReason" class="form-control" rows="3" maxlength="500"
+                        [value]="cancelReason()"
+                        (input)="cancelReason.set($any($event.target).value)"
+                        placeholder="e.g. My plans changed"></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-danger btn-sm" [disabled]="busy()"
+                      (click)="confirmCancel()">Confirm cancellation</button>
+              <button type="button" class="btn btn-secondary btn-sm" (click)="closeCancel()">
+                Keep booking
+              </button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- Payments -->
+  <div class="card section-gap">
+    <div class="card-header">Payments</div>
+
+    @if (b.payments.length === 0) {
+      <div class="empty-state"><p>No payments have been made yet.</p></div>
+    } @else {
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th><th>Type</th><th>Method</th><th>Status</th>
+              <th class="num">Amount</th><th class="num">Refunded</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of b.payments; track p.id) {
+              <tr>
+                <td>{{ p.createdAt | date:'d MMM y, h:mm a' }}</td>
+                <td class="cell-title">{{ p.type | enumLabel }}</td>
+                <td>{{ methodLabel(p.method) }}</td>
+                <td><app-status-badge [status]="p.status" /></td>
+                <td class="num">{{ p.amount | currency:'INR':'symbol':'1.0-2' }}</td>
+                <td class="num">
+                  @if (p.refundedAmount > 0) {
+                    {{ p.refundedAmount | currency:'INR':'symbol':'1.0-2' }}
+                  } @else {
+                    <span class="text-muted">-</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+} @else {
+  <div class="alert alert-danger">{{ error() ?? 'Booking not found.' }}</div>
+}

@@ -49,7 +49,8 @@ export class VehicleForm implements OnInit {
     fuelType: ['Petrol' as FuelType, Validators.required],
     transmission: ['Manual' as TransmissionType, Validators.required],
     seatingCapacity: [5, [Validators.required, Validators.min(1), Validators.max(60)]],
-    odometerKm: [0, [Validators.required, Validators.min(0)]]
+    odometerKm: [0, [Validators.required, Validators.min(0)]],
+    dailyRate: [0, [Validators.required, Validators.min(0)]]
   });
 
   get f() { return this.form.controls; }

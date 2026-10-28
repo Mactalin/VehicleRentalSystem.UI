@@ -1,0 +1,87 @@
+<div class="no-print">
+  <a class="back-link" [routerLink]="['/payments/booking', bookingId(), 'settlement']">
+    &larr; Settlement summary
+  </a>
+
+  <app-page-header title="Invoice" subtitle="Your tax invoice for this rental">
+    @if (invoice()) {
+      <button type="button" class="btn btn-primary" (click)="print()">Print or save as PDF</button>
+    }
+  </app-page-header>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner message="Loading invoice..." />
+} @else if (invoice(); as inv) {
+
+  <div class="card invoice">
+
+    <div class="invoice__head">
+      <div class="invoice__brand">
+        <strong>DriveEase</strong>
+        <p class="text-muted">Rental Management</p>
+      </div>
+      <div class="invoice__meta">
+        <h2>Tax invoice</h2>
+        <p>{{ inv.invoiceNumber }}</p>
+        <app-status-badge [status]="inv.status" />
+      </div>
+    </div>
+
+    <div class="invoice__parties">
+      <div>
+        <h4>Billed to</h4>
+        <p><strong>{{ inv.customerName }}</strong></p>
+      </div>
+      <div>
+        <h4>Booking</h4>
+        <p>{{ inv.bookingNumber }}</p>
+        <p class="text-muted">Issued {{ inv.issuedAt | date:'d MMM y' }}</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th class="num">Qty</th>
+            <th class="num">Unit price</th>
+            <th class="num">GST</th>
+            <th class="num">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of inv.items; track $index) {
+            <tr>
+              <td class="cell-title">{{ item.description }}</td>
+              <td class="num">{{ item.quantity }}</td>
+              <td class="num">{{ item.unitPrice | currency:'INR':'symbol':'1.0-2' }}</td>
+              <td class="num">
+                {{ item.taxAmount | currency:'INR':'symbol':'1.0-2' }}
+                <div class="cell-sub">{{ item.taxRate | percent:'1.0-2' }}</div>
+              </td>
+              <td class="num">{{ item.lineAmount | currency:'INR':'symbol':'1.0-2' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="invoice__totals">
+      <div><span>Subtotal</span><span>{{ inv.subTotal | currency:'INR':'symbol':'1.0-2' }}</span></div>
+      <div><span>GST</span><span>{{ inv.taxTotal | currency:'INR':'symbol':'1.0-2' }}</span></div>
+      <div class="grand"><span>Total</span><span>{{ inv.grandTotal | currency:'INR':'symbol':'1.0-2' }}</span></div>
+    </div>
+
+    <p class="form-hint" style="padding: 0 28px 24px">
+      The refundable security deposit is not part of this invoice.
+    </p>
+  </div>
+
+} @else {
+  <div class="alert alert-info">
+    The invoice is not available yet. It is created when your rental is completed.
+    @if (error()) { <span class="text-muted"> ({{ error() }})</span> }
+  </div>
+}

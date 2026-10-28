@@ -1,0 +1,98 @@
+<app-page-header title="Customers" subtitle="Review documents and manage customer accounts" />
+
+<form class="card filters" (submit)="onSearch($event)">
+  <div class="form-group grow">
+    <label class="form-label" for="search">Search</label>
+    <input id="search" class="form-control" type="search" placeholder="Name or phone"
+           [value]="search()" (input)="search.set($any($event.target).value)" />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="verification">Verification</label>
+    <select id="verification" class="form-control" #verSel (change)="setVerification(verSel.value)">
+      <option value="" [selected]="verification() === ''">All</option>
+      @for (v of verifications; track v) {
+        <option [value]="v" [selected]="verification() === v">{{ v }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="status">Account status</label>
+    <select id="status" class="form-control" #statusSel (change)="setStatus(statusSel.value)">
+      <option value="" [selected]="status() === ''">All</option>
+      @for (s of statuses; track s) {
+        <option [value]="s" [selected]="status() === s">{{ s }}</option>
+      }
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Search</button>
+  <button type="button" class="btn btn-secondary" (click)="clear()">Clear</button>
+</form>
+
+@if (error()) {
+  <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+}
+
+@if (loading()) {
+  <app-loading-spinner message="Loading customers..." />
+} @else if (customers().length === 0) {
+  <div class="card empty-state">
+    <h3>No customers found</h3>
+    <p>Try changing the filters or the search text.</p>
+  </div>
+} @else {
+  <p class="results-meta">{{ totalCount() }} customer{{ totalCount() === 1 ? '' : 's' }}</p>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>City</th>
+            <th>Verification</th>
+            <th>Account</th>
+            <th>Joined</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of customers(); track c.id) {
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <span class="avatar-sm">{{ initials(c.fullName) }}</span>
+                  <div>
+                    <div class="cell-title">{{ c.fullName }}</div>
+                    <div class="cell-sub">{{ c.phone }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>{{ c.city }}</td>
+              <td><app-status-badge [status]="c.verificationStatus" /></td>
+              <td><app-status-badge [status]="c.status" /></td>
+              <td>{{ c.createdAt | date:'d MMM y' }}</td>
+              <td>
+                <div class="row-actions">
+                  <a class="btn btn-secondary btn-sm" [routerLink]="['/customers', c.id]">Review</a>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  @if (totalPages() > 1) {
+    <div class="pager">
+      <button type="button" class="btn btn-secondary btn-sm" [disabled]="page() <= 1"
+              (click)="goTo(page() - 1)">Previous</button>
+      <span class="pager__info">Page {{ page() }} of {{ totalPages() }}</span>
+      <button type="button" class="btn btn-secondary btn-sm" [disabled]="page() >= totalPages()"
+              (click)="goTo(page() + 1)">Next</button>
+    </div>
+  }
+}

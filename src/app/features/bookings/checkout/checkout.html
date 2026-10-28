@@ -1,0 +1,171 @@
+<a class="back-link" routerLink="/search">&larr; Back to search</a>
+
+<app-page-header title="Checkout" subtitle="Review your trip and pay the advance to confirm it" />
+
+@if (loading()) {
+  <app-loading-spinner message="Preparing your booking..." />
+} @else if (!vehicle() || !quote()) {
+  <div class="alert alert-danger">{{ error() ?? 'We could not prepare this booking.' }}</div>
+} @else {
+  @let v = vehicle()!;
+  @let q = quote()!;
+
+  @if (error()) {
+    <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+  }
+
+  <ng-template #methodPicker>
+    <p class="form-label" style="margin-bottom: 8px">Payment method</p>
+    <div class="method-grid">
+      @for (m of methods; track m.value) {
+        <label class="method">
+          <input type="radio" name="method" [checked]="method() === m.value" (change)="method.set(m.value)" />
+          {{ m.label }}
+        </label>
+      }
+    </div>
+  </ng-template>
+
+  <div class="quote-layout">
+
+    <!-- Trip summary -->
+    <div class="card">
+      <div class="card-body">
+        <div class="quote-vehicle">
+          <div>
+            <h3>{{ v.make }} {{ v.model }} ({{ v.year }})</h3>
+            <p class="text-muted">{{ v.categoryName }}</p>
+          </div>
+          @if (booking(); as b) {
+            <app-status-badge [status]="b.status" />
+          }
+        </div>
+
+        <dl class="breakdown">
+          <div class="breakdown__row">
+            <dt>Pickup</dt>
+            <dd>{{ from() | date:'EEE, d MMM y, h:mm a' }}</dd>
+          </div>
+          <div class="breakdown__row">
+            <dt>Return</dt>
+            <dd>{{ to() | date:'EEE, d MMM y, h:mm a' }}</dd>
+          </div>
+          <div class="breakdown__row">
+            <dt>Pickup branch</dt>
+            <dd>{{ v.branchName }}</dd>
+          </div>
+        </dl>
+
+        <div class="form-group mt-16">
+          <label class="form-label" for="dropBranch">Return branch</label>
+          <select id="dropBranch" class="form-control" #dropSel
+                  [disabled]="!!booking()" (change)="dropBranchId.set(+dropSel.value)">
+            @for (b of branches(); track b.id) {
+              <option [value]="b.id" [selected]="dropBranchId() === b.id">{{ b.name }} &ndash; {{ b.city }}</option>
+            }
+          </select>
+          <span class="form-hint">You can return the vehicle at a different branch.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right side changes with the step -->
+    <div class="card">
+      <div class="card-body">
+
+        @if (!booking()) {
+
+          <!-- Step 1: review and create -->
+          <app-price-breakdown [quote]="q" />
+
+          <div class="alert alert-info mt-16">
+            Your booking is held for 15 minutes while you pay the advance.
+          </div>
+
+          <button type="button" class="btn btn-primary btn-block mt-16"
+                  [disabled]="creating()" (click)="createBooking()">
+            @if (creating()) { <span class="btn-spinner"></span> }
+            {{ creating() ? 'Creating booking...' : 'Confirm and continue to payment' }}
+          </button>
+
+        } @else if (expired()) {
+
+          <!-- The hold ran out -->
+          <div class="alert alert-warning">
+            Your booking expired because the advance was not paid in time. Please search again.
+          </div>
+          <a class="btn btn-primary btn-block mt-16" routerLink="/search">Back to search</a>
+
+        } @else if (booking()!.status === 'Pending') {
+
+          <!-- Step 2: pay the advance -->
+          <div class="countdown" [class.countdown--urgent]="urgent()">
+            <span>Complete payment within</span>
+            <strong>{{ countdown() }}</strong>
+          </div>
+
+          <dl class="breakdown">
+            <div class="breakdown__row">
+              <dt>Booking number</dt>
+              <dd>{{ booking()!.bookingNumber }}</dd>
+            </div>
+            <div class="breakdown__row">
+              <dt>Total</dt>
+              <dd>{{ booking()!.totalAmount | currency:'INR':'symbol':'1.0-2' }}</dd>
+            </div>
+          </dl>
+
+          <div class="breakdown__total">
+            <span>Advance to pay now</span>
+            <strong>{{ booking()!.advanceAmount | currency:'INR':'symbol':'1.0-2' }}</strong>
+          </div>
+
+          <div class="mt-16">
+            <ng-container [ngTemplateOutlet]="methodPicker" />
+          </div>
+
+          <button type="button" class="btn btn-primary btn-block" [disabled]="paying()"
+                  (click)="pay('Advance')">
+            @if (paying()) { <span class="btn-spinner"></span> }
+            {{ paying() ? 'Processing...' : 'Pay ' + (booking()!.advanceAmount | currency:'INR':'symbol':'1.0-2') }}
+          </button>
+
+        } @else {
+
+          <!-- Step 3: confirmed -->
+          <div class="success-panel">
+            <div class="success-panel__icon">&#10003;</div>
+            <h3>Booking confirmed</h3>
+            <p class="text-muted">Your advance payment was received.</p>
+            <p class="ref">{{ booking()!.bookingNumber }}</p>
+          </div>
+
+          @if (booking()!.securityDeposit > 0 && !depositPaid()) {
+            <div class="alert alert-info">
+              A refundable security deposit of
+              <strong>{{ booking()!.securityDeposit | currency:'INR':'symbol':'1.0-2' }}</strong>
+              must be paid before pickup. You can pay it now.
+            </div>
+
+            <div class="mt-16">
+              <ng-container [ngTemplateOutlet]="methodPicker" />
+            </div>
+
+            <button type="button" class="btn btn-primary btn-block" [disabled]="paying()"
+                    (click)="pay('SecurityDeposit')">
+              @if (paying()) { <span class="btn-spinner"></span> }
+              {{ paying() ? 'Processing...' : 'Pay deposit' }}
+            </button>
+          } @else if (depositPaid()) {
+            <div class="alert alert-success">Security deposit paid. You are ready for pickup.</div>
+          }
+
+          <div class="form-actions mt-16">
+            <a class="btn btn-secondary" [routerLink]="['/bookings', booking()!.id]">View booking</a>
+            <a class="btn btn-ghost" routerLink="/search">Find another vehicle</a>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

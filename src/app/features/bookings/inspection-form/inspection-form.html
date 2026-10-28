@@ -1,0 +1,72 @@
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+
+  @if (localError()) {
+    <div class="alert alert-danger" style="margin-bottom: 16px">{{ localError() }}</div>
+  }
+
+  <div class="form-grid">
+    <div class="form-group">
+      <label class="form-label" for="odometerReading">Odometer reading</label>
+      <div class="input-suffix">
+        <input id="odometerReading" class="form-control" type="number" min="0"
+               formControlName="odometerReading" />
+        <span>km</span>
+      </div>
+      @if (f.odometerReading.touched && f.odometerReading.errors) {
+        <span class="form-error">Enter the odometer reading.</span>
+      } @else if (mode() === 'return' && minOdometer() > 0) {
+        <span class="form-hint">At pickup it was {{ minOdometer() }} km.</span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="fuelLevelPercent">Fuel level</label>
+      <div class="input-suffix">
+        <input id="fuelLevelPercent" class="form-control" type="number" min="0" max="100"
+               formControlName="fuelLevelPercent" />
+        <span>%</span>
+      </div>
+      @if (f.fuelLevelPercent.touched && f.fuelLevelPercent.errors) {
+        <span class="form-error">Enter a value between 0 and 100.</span>
+      }
+    </div>
+
+    <div class="form-group span-2">
+      <label class="form-label" for="damageNotes">
+        {{ mode() === 'return' ? 'Condition and damage notes' : 'Condition notes' }}
+        <span class="text-muted">(optional)</span>
+      </label>
+      <textarea id="damageNotes" class="form-control" rows="3" formControlName="damageNotes"
+                placeholder="e.g. Small scratch on the rear bumper"></textarea>
+    </div>
+
+    <div class="form-group span-2">
+      <label class="form-label" for="photoUrls">Photo links <span class="text-muted">(optional)</span></label>
+      <input id="photoUrls" class="form-control" type="text" formControlName="photoUrls"
+             placeholder="https://..., https://..." />
+      <span class="form-hint">Separate several links with commas.</span>
+    </div>
+
+    @if (mode() === 'return') {
+      <div class="form-group">
+        <label class="form-label" for="damageCharge">Damage charge</label>
+        <div class="input-prefix">
+          <span>&#8377;</span>
+          <input id="damageCharge" class="form-control" type="number" min="0" formControlName="damageCharge" />
+        </div>
+        @if (f.damageCharge.touched && f.damageCharge.errors) {
+          <span class="form-error">Enter zero or a positive amount.</span>
+        } @else {
+          <span class="form-hint">Taken from the security deposit first.</span>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="form-actions" style="margin-top: 24px">
+    <button type="submit" class="btn btn-primary" [disabled]="saving()">
+      @if (saving()) { <span class="btn-spinner"></span> }
+      {{ saving() ? 'Saving...' : submitLabel() }}
+    </button>
+  </div>
+</form>

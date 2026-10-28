@@ -1,0 +1,215 @@
+<p>customer-documents works!</p>
+<app-page-header title="Documents"
+                 subtitle="Upload your ID and driving licence. Our team reviews them before your first booking." />
+
+@if (loading()) {
+  <app-loading-spinner message="Loading your documents..." />
+} @else if (customer(); as c) {
+
+  <div class="alert alert-info" style="margin-bottom: 16px">
+    Verification status:
+    <app-status-badge [status]="c.verificationStatus" />
+    &nbsp;You need one approved ID and one approved driving licence to rent a vehicle.
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+  }
+  @if (message()) {
+    <div class="alert alert-success" style="margin-bottom: 16px">{{ message() }}</div>
+  }
+
+  <!-- ===== KYC ===== -->
+  <div class="card doc-card">
+    <div class="card-header">Identity documents</div>
+
+    @if (c.kycDocuments.length > 0) {
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>Type</th><th>Number</th><th>File</th><th>Status</th><th>Submitted</th></tr>
+          </thead>
+          <tbody>
+            @for (d of c.kycDocuments; track d.id) {
+              <tr>
+                <td class="cell-title">{{ d.documentType | enumLabel }}</td>
+                <td>{{ d.documentNumber }}</td>
+                <td class="cell-clamp">
+                  @if (isUrl(d.filePath)) {
+                    <a [href]="d.filePath" target="_blank" rel="noopener">Open file</a>
+                  } @else {
+                    {{ d.filePath }}
+                  }
+                </td>
+                <td>
+                  <app-status-badge [status]="d.status" />
+                  @if (d.rejectionReason) {
+                    <p class="reason-note">{{ d.rejectionReason }}</p>
+                  }
+                </td>
+                <td>{{ d.createdAt | date:'d MMM y' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <h3>No ID uploaded yet</h3>
+        <p>Add an Aadhaar, passport, voter ID or PAN card below.</p>
+      </div>
+    }
+
+    <form class="doc-form" [formGroup]="kycForm" (ngSubmit)="addKyc()" novalidate>
+      <p class="doc-form__title">Add an ID document</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="documentType">Document type</label>
+          <select id="documentType" class="form-control" formControlName="documentType">
+            @for (t of kycTypes; track t) {
+              <option [ngValue]="t">{{ t | enumLabel }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="documentNumber">Document number</label>
+          <input id="documentNumber" class="form-control" type="text" formControlName="documentNumber" />
+          @if (k.documentNumber.touched && k.documentNumber.errors) {
+            <span class="form-error">Document number is required.</span>
+          }
+        </div>
+
+        <div class="form-group span-2">
+          <label class="form-label" for="kycFile">File link</label>
+          <input id="kycFile" class="form-control" type="text" formControlName="filePath"
+                 placeholder="https://..." />
+          @if (k.filePath.touched && k.filePath.errors) {
+            <span class="form-error">Add the link to your document file.</span>
+          } @else {
+            <span class="form-hint">A link to a clear photo or scan of the document.</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-sm" [disabled]="savingKyc()">
+          @if (savingKyc()) { <span class="btn-spinner"></span> }
+          {{ savingKyc() ? 'Submitting...' : 'Submit ID' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===== Licence ===== -->
+  <div class="card doc-card">
+    <div class="card-header">Driving licence</div>
+
+    @if (c.drivingLicences.length > 0) {
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>Licence number</th><th>Authority</th><th>Valid</th><th>File</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            @for (d of c.drivingLicences; track d.id) {
+              <tr>
+                <td>
+                  <div class="cell-title">{{ d.licenceNumber }}</div>
+                  <div class="cell-sub">{{ d.vehicleClasses }}</div>
+                </td>
+                <td>{{ d.issuingAuthority }}</td>
+                <td>{{ d.issueDate | date:'d MMM y' }} &ndash; {{ d.expiryDate | date:'d MMM y' }}</td>
+                <td class="cell-clamp">
+                  @if (isUrl(d.filePath)) {
+                    <a [href]="d.filePath" target="_blank" rel="noopener">Open file</a>
+                  } @else {
+                    {{ d.filePath }}
+                  }
+                </td>
+                <td>
+                  <app-status-badge [status]="d.status" />
+                  @if (d.rejectionReason) {
+                    <p class="reason-note">{{ d.rejectionReason }}</p>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <h3>No licence uploaded yet</h3>
+        <p>Add your driving licence below.</p>
+      </div>
+    }
+
+    <form class="doc-form" [formGroup]="licenceForm" (ngSubmit)="addLicence()" novalidate>
+      <p class="doc-form__title">Add a driving licence</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="licenceNumber">Licence number</label>
+          <input id="licenceNumber" class="form-control" type="text" formControlName="licenceNumber" />
+          @if (l.licenceNumber.touched && l.licenceNumber.errors) {
+            <span class="form-error">Licence number is required.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="issuingAuthority">Issuing authority</label>
+          <input id="issuingAuthority" class="form-control" type="text"
+                 formControlName="issuingAuthority" placeholder="e.g. RTO Trichy" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="issueDate">Issue date</label>
+          <input id="issueDate" class="form-control" type="date" formControlName="issueDate" />
+          @if (l.issueDate.touched && l.issueDate.errors) {
+            <span class="form-error">Issue date is required.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="expiryDate">Expiry date</label>
+          <input id="expiryDate" class="form-control" type="date" formControlName="expiryDate" />
+          @if (l.expiryDate.touched && l.expiryDate.errors) {
+            <span class="form-error">Expiry date is required.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="vehicleClasses">Vehicle classes</label>
+          <input id="vehicleClasses" class="form-control" type="text"
+                 formControlName="vehicleClasses" placeholder="e.g. LMV, MCWG" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="licenceFile">File link</label>
+          <input id="licenceFile" class="form-control" type="text" formControlName="filePath"
+                 placeholder="https://..." />
+          @if (l.filePath.touched && l.filePath.errors) {
+            <span class="form-error">Add the link to your licence file.</span>
+          }
+        </div>
+      </div>
+
+      @if (licenceForm.touched && licenceForm.errors?.['order']) {
+        <p class="form-error" style="margin-top: 12px">The expiry date must be after the issue date.</p>
+      }
+      @if (licenceForm.touched && licenceForm.errors?.['expired']) {
+        <p class="form-error" style="margin-top: 12px">This licence has already expired.</p>
+      }
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-sm" [disabled]="savingLicence()">
+          @if (savingLicence()) { <span class="btn-spinner"></span> }
+          {{ savingLicence() ? 'Submitting...' : 'Submit licence' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+} @else {
+  <div class="alert alert-danger">{{ error() ?? 'We could not load your documents.' }}</div>
+}

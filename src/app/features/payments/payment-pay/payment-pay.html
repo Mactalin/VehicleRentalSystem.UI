@@ -1,0 +1,158 @@
+<a class="back-link" [routerLink]="['/payments/booking', bookingId(), 'settlement']">
+  &larr; Settlement summary
+</a>
+
+<app-page-header title="Make a payment" subtitle="Pay what is due on this booking" />
+
+@if (loading()) {
+  <app-loading-spinner message="Loading payment details..." />
+} @else if (booking(); as b) {
+  @if (settlement(); as s) {
+
+    @if (error()) {
+      <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+    }
+    @if (message()) {
+      <div class="alert alert-success" style="margin-bottom: 16px">{{ message() }}</div>
+    }
+
+    <div class="quote-layout">
+
+      <!-- Booking summary -->
+      <div class="card">
+        <div class="card-body">
+          <div class="quote-vehicle">
+            <div>
+              <h3>{{ b.vehicleName }}</h3>
+              <p class="text-muted">{{ b.bookingNumber }}</p>
+            </div>
+            <app-status-badge [status]="b.status" />
+          </div>
+
+          <dl class="breakdown">
+            <div class="breakdown__row">
+              <dt>Pickup</dt>
+              <dd>{{ b.startAt | date:'EEE, d MMM y, h:mm a' }}</dd>
+            </div>
+            <div class="breakdown__row">
+              <dt>Return</dt>
+              <dd>{{ b.endAt | date:'EEE, d MMM y, h:mm a' }}</dd>
+            </div>
+            <div class="breakdown__row">
+              <dt>Rental total (incl. GST)</dt>
+              <dd>{{ s.totalAmount | currency:'INR':'symbol':'1.0-2' }}</dd>
+            </div>
+            <div class="breakdown__row">
+              <dt>Paid so far</dt>
+              <dd>{{ s.rentalPaid | currency:'INR':'symbol':'1.0-2' }}</dd>
+            </div>
+            <div class="breakdown__row breakdown__row--sub">
+              <dt>Rental balance</dt>
+              <dd>{{ s.rentalBalance | currency:'INR':'symbol':'1.0-2' }}</dd>
+            </div>
+            <div class="breakdown__row">
+              <dt>Security deposit paid</dt>
+              <dd>{{ s.depositPaid | currency:'INR':'symbol':'1.0-2' }}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- What is due -->
+      <div class="card">
+        <div class="card-header">Payments due</div>
+        <div class="card-body">
+
+          @if (lapsed()) {
+            <div class="alert alert-warning">
+              This booking expired because the advance was not paid in time.
+            </div>
+            <a class="btn btn-primary btn-block mt-16" routerLink="/search">Back to search</a>
+
+          } @else if (closed()) {
+            <div class="alert alert-info">
+              This booking is {{ b.status | enumLabel }}, so no payments are due.
+            </div>
+
+          } @else if (dues().length === 0) {
+            <div class="alert alert-success">Nothing is due right now.</div>
+            @if (b.status === 'Returned') {
+              <p class="form-hint mt-16">
+                Everything is paid. Our team will complete your rental and return any remaining deposit.
+              </p>
+            }
+
+          } @else {
+            <p class="form-label" style="margin-bottom: 8px">Payment method</p>
+            <div class="method-grid">
+              @for (m of methods(); track m.value) {
+                <label class="method">
+                  <input type="radio" name="method" [checked]="method() === m.value"
+                         (change)="method.set(m.value)" />
+                  {{ m.label }}
+                </label>
+              }
+            </div>
+
+            <div class="due-list">
+              @for (d of dues(); track d.type) {
+                <div class="due-row">
+                  <div>
+                    <div class="due-row__label">{{ d.label }}</div>
+                    <div class="due-row__note">{{ d.note }}</div>
+                  </div>
+                  <div class="due-row__pay">
+                    <span class="due-row__amount">{{ d.amount | currency:'INR':'symbol':'1.0-2' }}</span>
+                    <button type="button" class="btn btn-primary btn-sm" [disabled]="paying() !== null"
+                            (click)="pay(d)">
+                      @if (paying() === d.type) { <span class="btn-spinner"></span> }
+                      {{ paying() === d.type ? 'Processing...' : 'Pay' }}
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+
+            @if (b.status === 'Pending') {
+              <p class="form-hint mt-16">
+                The security deposit can be paid once your booking is confirmed.
+              </p>
+            }
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Payments on this booking -->
+    <div class="card section-gap">
+      <div class="card-header">Payments on this booking</div>
+
+      @if (b.payments.length === 0) {
+        <div class="empty-state"><p>No payments have been made yet.</p></div>
+      } @else {
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Date</th><th>Type</th><th>Method</th><th>Status</th><th class="num">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of b.payments; track p.id) {
+                <tr>
+                  <td>{{ p.createdAt | date:'d MMM y, h:mm a' }}</td>
+                  <td class="cell-title">{{ p.type | enumLabel }}</td>
+                  <td>{{ methodLabel(p.method) }}</td>
+                  <td><app-status-badge [status]="p.status" /></td>
+                  <td class="num">{{ p.amount | currency:'INR':'symbol':'1.0-2' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+} @else {
+  <div class="alert alert-danger">{{ error() ?? 'Booking not found.' }}</div>
+}

@@ -31,25 +31,54 @@ const ICONS = {
   fileAlert: 'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M12 12v4M12 18h.01',
   user: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
   logout: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',
-  menu: 'M3 6h18M3 12h18M3 18h18'
+  menu: 'M3 6h18M3 12h18M3 18h18',
+    search: 'M21 21l-4.3-4.3M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14z',
+      idCard: 'M3 5h18v14H3zM7 10h4M7 14h2M15 10h2M15 14h2',
+  document: 'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6',
+  history: 'M12 8v4l3 2M21 12a9 9 0 1 1-3-6.7M21 4v5h-5',
+    wallet: 'M3 7a2 2 0 0 1 2-2h14v4M3 7v10a2 2 0 0 0 2 2h16V9H5a2 2 0 0 1-2-2zM17 14h.01',
+  receipt: 'M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z M9 8h6M9 12h6',
+    calendar: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z',
 };
 
 // Add Mac's and Lenin's pages here later (Bookings, Customers, Payments, Offers, Reports...)
 const NAV: NavGroup[] = [
   {
+    label: 'Management',
+    items: [
+      { label: 'Bookings', path: '/bookings/manage', icon: ICONS.calendar, roles: ['Admin', 'Manager', 'Staff'] },
+      { label: 'Customers', path: '/customers', icon: ICONS.idCard, roles: ['Admin', 'Manager', 'Staff'] },
+      { label: 'Refunds', path: '/payments/refunds', icon: ICONS.receipt, roles: ['Admin', 'Manager'] }
+    ]
+  },
+  {
+    label: 'My rentals',
+    items: [
+      { label: 'Rental profile', path: '/customer/profile', icon: ICONS.idCard, roles: ['Customer'] },
+      { label: 'Documents', path: '/customer/documents', icon: ICONS.document, roles: ['Customer'] },
+      { label: 'Rental history', path: '/customer/history', icon: ICONS.history, roles: ['Customer'] },
+      { label: 'Payments', path: '/payments', icon: ICONS.wallet, roles: ['Customer'] }
+    ]
+  },
+  {
+    label: 'Rent a vehicle',
+    items: [
+      { label: 'Find a vehicle', path: '/search', icon: ICONS.search, roles: ['Customer'] }
+    ]
+  },
+  {
     label: 'Fleet',
     items: [
-      { label: 'Vehicles', path: '/vehicles', icon: ICONS.car, excludes: ['/vehicles/expiring-documents'] },
-      { label: 'Branches', path: '/branches', icon: ICONS.building },
-      { label: 'Price quote', path: '/pricing', icon: ICONS.quote }
+      { label: 'Vehicles', path: '/vehicles', icon: ICONS.car, roles: ['Admin', 'Manager', 'Staff'], excludes: ['/vehicles/expiring-documents'] },
+      { label: 'Branches', path: '/branches', icon: ICONS.building, roles: ['Admin', 'Manager', 'Staff'] },
+      { label: 'Price quote', path: '/pricing', icon: ICONS.quote, roles: ['Admin', 'Manager', 'Staff'] }
     ]
   },
   {
     label: 'Operations',
     items: [
       { label: 'Maintenance', path: '/maintenance', icon: ICONS.wrench, roles: ['Admin', 'Manager', 'Staff'] },
-      { label: 'Document expiry', path: '/vehicles/expiring-documents', icon: ICONS.fileAlert,
-        roles: ['Admin', 'Manager', 'Staff'], exact: true }
+      { label: 'Document expiry', path: '/vehicles/expiring-documents', icon: ICONS.fileAlert, roles: ['Admin', 'Manager', 'Staff'], exact: true }
     ]
   },
   {

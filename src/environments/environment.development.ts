@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://localhost:7001/api'   // use the port from launchSettings.json
+  apiUrl: 'https://localhost:7114/api'   // use the port from launchSettings.json
 };

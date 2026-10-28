@@ -1,0 +1,139 @@
+<app-page-header title="Rental profile"
+                 subtitle="The details we need before you can rent a vehicle" />
+
+@if (loading()) {
+  <app-loading-spinner message="Loading your profile..." />
+} @else {
+
+  @if (required() && !customer()) {
+    <div class="alert alert-info" style="margin-bottom: 16px">
+      Complete your rental profile to book a vehicle.
+    </div>
+  }
+
+  <div class="profile-layout">
+
+    <!-- Summary -->
+    <div class="card profile-summary">
+      <div class="card-body">
+        <div class="profile-avatar">{{ initials() }}</div>
+        <h2 class="profile-name">{{ displayName() }}</h2>
+
+        @if (customer(); as c) {
+          <div class="profile-badges">
+            <app-status-badge [status]="c.verificationStatus" />
+            <app-status-badge [status]="c.status" />
+          </div>
+
+          <dl class="profile-meta">
+            <div><dt>KYC documents</dt><dd>{{ c.kycDocuments.length }}</dd></div>
+            <div><dt>Driving licences</dt><dd>{{ c.drivingLicences.length }}</dd></div>
+          </dl>
+
+          @if (c.verificationStatus === 'Verified') {
+            <div class="alert alert-success" style="margin-top: 20px">
+              You are verified and can book vehicles.
+            </div>
+          } @else {
+            <div class="alert alert-info" style="margin-top: 20px">
+              @if (c.verificationStatus === 'Rejected') {
+                A document was rejected. Please upload it again.
+              } @else {
+                Your documents are waiting for review.
+              }
+            </div>
+            <a class="btn btn-secondary btn-block mt-16" routerLink="/customer/documents">
+              Go to documents
+            </a>
+          }
+        } @else {
+          <p class="profile-email">Not completed yet</p>
+        }
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="card-header">{{ isEdit ? 'Your details' : 'Complete your profile' }}</div>
+      <div class="card-body">
+
+        @if (error()) {
+          <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div>
+        }
+        @if (saved()) {
+          <div class="alert alert-success" style="margin-bottom: 16px">Your details were saved.</div>
+        }
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="fullName">Full name</label>
+            <input id="fullName" class="form-control" type="text" formControlName="fullName" />
+            @if (f.fullName.touched && f.fullName.errors) {
+              <span class="form-error">Full name is required.</span>
+            } @else {
+              <span class="form-hint">Use the name on your driving licence.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="phone">Phone</label>
+            <input id="phone" class="form-control" type="tel" formControlName="phone" />
+            @if (f.phone.touched && f.phone.errors) {
+              <span class="form-error">Enter a valid phone number.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="dateOfBirth">Date of birth</label>
+            <input id="dateOfBirth" class="form-control" type="date" formControlName="dateOfBirth"
+                   [max]="maxDob" />
+            @if (f.dateOfBirth.touched && f.dateOfBirth.errors?.['underage']) {
+              <span class="form-error">You must be at least 18 years old to rent a vehicle.</span>
+            } @else if (f.dateOfBirth.touched && f.dateOfBirth.errors) {
+              <span class="form-error">Date of birth is required.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="postalCode">Postal code</label>
+            <input id="postalCode" class="form-control" type="text" formControlName="postalCode" />
+            @if (f.postalCode.touched && f.postalCode.errors) {
+              <span class="form-error">Postal code is required.</span>
+            }
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label" for="address">Address</label>
+            <input id="address" class="form-control" type="text" formControlName="address" />
+            @if (f.address.touched && f.address.errors) {
+              <span class="form-error">Address is required.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="city">City</label>
+            <input id="city" class="form-control" type="text" formControlName="city" />
+            @if (f.city.touched && f.city.errors) {
+              <span class="form-error">City is required.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="state">State</label>
+            <input id="state" class="form-control" type="text" formControlName="state" />
+            @if (f.state.touched && f.state.errors) {
+              <span class="form-error">State is required.</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 24px">
+          <button type="submit" class="btn btn-primary" [disabled]="saving()">
+            @if (saving()) { <span class="btn-spinner"></span> }
+            {{ saving() ? 'Saving...' : (isEdit ? 'Save changes' : 'Save and continue') }}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+}

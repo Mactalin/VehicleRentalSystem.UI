@@ -1,0 +1,159 @@
+<a class="back-link" routerLink="/payments">&larr; Payments</a>
+
+@if (loading()) {
+  <app-loading-spinner message="Loading settlement..." />
+} @else if (booking(); as b) {
+  @if (settlement(); as s) {
+
+    <app-page-header title="Settlement" [subtitle]="b.bookingNumber + ' · ' + b.vehicleName">
+      <app-status-badge [status]="b.status" />
+      @if (!closed()) {
+        <a class="btn btn-primary" [routerLink]="['/payments/booking', b.id, 'pay']">Make a payment</a>
+      }
+      @if (hasInvoice()) {
+        <a class="btn btn-secondary" [routerLink]="['/payments/booking', b.id, 'invoice']">View invoice</a>
+      }
+    </app-page-header>
+
+    @if (s.isSettled) {
+      <div class="alert alert-success" style="margin-bottom: 16px">
+        Everything is paid. Nothing more is due on this booking.
+      </div>
+    } @else if (s.totalDue > 0) {
+      <div class="alert alert-warning" style="margin-bottom: 16px">
+        {{ s.totalDue | currency:'INR':'symbol':'1.0-2' }} is still due on this booking.
+      </div>
+    }
+
+    <div class="detail-layout">
+
+      <!-- Rental -->
+      <div class="card">
+        <div class="card-header">Rental charges</div>
+        <div class="card-body">
+          <dl class="breakdown">
+            <div class="breakdown__row">
+              <dt>Rental total (incl. GST)</dt>
+              <dd>{{ s.totalAmount | currency:'INR':'symbol':'1.0-2' }}</dd>
+            </div>
+            <div class="breakdown__row">
+              <dt>Paid</dt>
+              <dd>{{ s.rentalPaid | currency:'INR':'symbol':'1.0-2' }}</dd>
+            </div>
+            <div class="breakdown__row breakdown__row--sub">
+              <dt>Rental balance</dt>
+              <dd>{{ s.rentalBalance | currency:'INR':'symbol':'1.0-2' }}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Deposit -->
+      <div class="card">
+        <div class="card-header">Security deposit</div>
+        <div class="card-body">
+          <dl class="breakdown">
+            <div class="breakdown__row">
+              <dt>Deposit paid</dt>
+              <dd>{{ s.depositPaid | currency:'INR':'symbol':'1.0-2' }}</dd>
+            </div>
+
+            @if (s.lateFee > 0) {
+              <div class="breakdown__row">
+                <dt>Late return charge</dt>
+                <dd>&minus;{{ s.lateFee | currency:'INR':'symbol':'1.0-2' }}</dd>
+              </div>
+            }
+            @if (s.damageCharge > 0) {
+              <div class="breakdown__row">
+                <dt>Damage charge</dt>
+                <dd>&minus;{{ s.damageCharge | currency:'INR':'symbol':'1.0-2' }}</dd>
+              </div>
+            }
+            @if (s.lateFeeDue > 0) {
+              <div class="breakdown__row">
+                <dt>Late charge not covered by deposit</dt>
+                <dd>{{ s.lateFeeDue | currency:'INR':'symbol':'1.0-2' }}</dd>
+              </div>
+            }
+            @if (s.damageChargeDue > 0) {
+              <div class="breakdown__row">
+                <dt>Damage charge not covered by deposit</dt>
+                <dd>{{ s.damageChargeDue | currency:'INR':'symbol':'1.0-2' }}</dd>
+              </div>
+            }
+            @if (s.depositRefunded > 0) {
+              <div class="breakdown__row">
+                <dt>Already returned to you</dt>
+                <dd>{{ s.depositRefunded | currency:'INR':'symbol':'1.0-2' }}</dd>
+              </div>
+            }
+
+            <div class="breakdown__row breakdown__row--sub">
+              <dt>Deposit to be returned</dt>
+              <dd>{{ s.depositToRefund | currency:'INR':'symbol':'1.0-2' }}</dd>
+            </div>
+          </dl>
+
+          @if (b.status === 'Returned' && s.depositToRefund > 0) {
+            <p class="form-hint mt-16">
+              Your deposit is returned when the rental is completed.
+            </p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="breakdown__total section-gap">
+      <span>Total still due</span>
+      <strong>{{ s.totalDue | currency:'INR':'symbol':'1.0-2' }}</strong>
+    </div>
+
+    <!-- Payments and refunds -->
+    <div class="card section-gap">
+      <div class="card-header">Payments and refunds</div>
+
+      @if (b.payments.length === 0) {
+        <div class="empty-state"><p>No payments have been made yet.</p></div>
+      } @else {
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Date</th><th>Type</th><th>Method</th><th>Status</th>
+                <th class="num">Amount</th><th class="num">Refunded</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of b.payments; track p.id) {
+                <tr>
+                  <td>{{ p.createdAt | date:'d MMM y, h:mm a' }}</td>
+                  <td>
+                    <div class="cell-title">{{ p.type | enumLabel }}</div>
+                    @for (r of p.refunds; track r.id) {
+                      <div class="refund-sub">
+                        Refund {{ r.amount | currency:'INR':'symbol':'1.0-2' }} &middot; {{ r.reason }}
+                      </div>
+                    }
+                  </td>
+                  <td>{{ methodLabel(p.method) }}</td>
+                  <td><app-status-badge [status]="p.status" /></td>
+                  <td class="num">{{ p.amount | currency:'INR':'symbol':'1.0-2' }}</td>
+                  <td class="num">
+                    @if (p.refundedAmount > 0) {
+                      {{ p.refundedAmount | currency:'INR':'symbol':'1.0-2' }}
+                    } @else {
+                      <span class="text-muted">-</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+} @else {
+  <div class="alert alert-danger">{{ error() ?? 'Booking not found.' }}</div>
+}
