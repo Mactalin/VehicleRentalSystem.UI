@@ -1,0 +1,13 @@
+.vr-card { border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.vr-card > .p-3.border-bottom { flex-wrap: wrap; gap: 12px; }
+.vr-card > .p-3.border-bottom > .d-flex { flex-wrap: wrap; }
+.vr-card .p-4 { line-height: 1.6; }
+.vr-card .row > .col-md-4 { padding-right: 12px; }
+.vr-card p { overflow-wrap: anywhere; }
+.vr-modal .form-label { display: block; margin-bottom: 7px; }
+.vr-modal .form-control { width: 100%; }
+
+@media (max-width: 575px) {
+  .vr-card > .p-3.border-bottom { align-items: flex-start; }
+  .vr-card > .p-3.border-bottom > .d-flex:last-child { width: 100%; }
+}

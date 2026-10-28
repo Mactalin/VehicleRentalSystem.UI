@@ -1,0 +1,72 @@
+<app-page-header
+  title="Drivers Directory"
+  subtitle="Manage your driver fleet, assignments, and availability.">
+
+  <a routerLink="/drivers/new" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-2"></i> Add Driver
+  </a>
+</app-page-header>
+
+<div class="vr-card">
+  <!-- Search Bar -->
+  <div class="d-flex justify-content-between mb-4">
+    <div class="header-search" style="width: 300px;">
+      <i class="bi bi-search"></i>
+      <input type="text" placeholder="Search by name, license or phone..."
+             [(ngModel)]="searchTerm" (input)="onSearch()" />
+    </div>
+  </div>
+
+  <app-spinner *ngIf="loading"></app-spinner>
+
+  <!-- Empty State -->
+  <app-empty-state
+    *ngIf="!loading && filteredDrivers.length === 0"
+    icon="bi-person-badge"
+    title="No drivers found"
+    message="Try adjusting your search or add a new driver.">
+  </app-empty-state>
+
+  <!-- Table -->
+  <div class="table-responsive" *ngIf="!loading && filteredDrivers.length > 0">
+    <table class="vr-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>License</th>
+          <th>Contact</th>
+          <th>Daily Rate</th>
+          <th>Status</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let driver of filteredDrivers">
+          <td>
+            <div class="fw-semibold">{{ driver.fullName }}</div>
+            <small class="text-muted">{{ driver.experienceYears }} years exp.</small>
+          </td>
+          <td>{{ driver.licenseNumber }}</td>
+          <td>
+            <div>{{ driver.phone }}</div>
+            <small class="text-muted" *ngIf="driver.email">{{ driver.email }}</small>
+          </td>
+          <td>₹{{ driver.chargePerDay }}</td>
+          <td>
+            <span class="vr-badge" [ngClass]="getStatusBadge(driver.status)">
+              {{ driver.status }}
+            </span>
+          </td>
+          <td class="text-end">
+            <a [routerLink]="['/drivers', driver.id, 'edit']" class="btn btn-sm btn-outline-primary me-2">
+              <i class="bi bi-pencil"></i>
+            </a>
+            <button (click)="deleteDriver(driver.id, driver.fullName)" class="btn btn-sm btn-outline-danger">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

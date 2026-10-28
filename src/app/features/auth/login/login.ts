@@ -35,7 +35,9 @@ export class Login {
     this.error.set(null);
 
     this.auth.login(this.form.getRawValue()).subscribe({
-      next: () => this.router.navigateByUrl('/'),
+      next: () => this.router.navigateByUrl(
+        this.auth.role() === 'Customer' ? '/search' : '/'
+      ),
       error: err => {
         this.error.set(err.message);
         this.loading.set(false);

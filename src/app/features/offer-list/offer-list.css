@@ -1,0 +1,20 @@
+.offer-banner {
+  height: 154px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+.offer-card { height: 100%; border: 1px solid var(--border); transition: transform .18s ease, box-shadow .18s ease; }
+.offer-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.offer-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(17,20,43,.05), rgba(17,20,43,.35)); }
+.offer-badge {
+  position: absolute; top: 16px; right: 16px; z-index: 2;
+  background: #f59e0b; color: #fff; font-weight: 800;
+  padding: 7px 14px; border-radius: 999px; font-size: .9rem;
+  box-shadow: 0 4px 12px rgba(245,158,11,0.4);
+}
+.offer-card h4 { color: var(--text); font-size: 18px; }
+.offer-card p { line-height: 1.6; }
+.vr-modal .form-label { display: block; margin-bottom: 7px; }
+.vr-modal .form-control { width: 100%; }

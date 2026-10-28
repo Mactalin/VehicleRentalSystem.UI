@@ -1,0 +1,117 @@
+<app-page-header title="Analytics & Reports" subtitle="Analyze your revenue, bookings, and fleet performance.">
+  <div class="d-flex gap-2 align-items-center bg-white p-2 rounded shadow-sm border">
+    <input type="date" class="form-control form-control-sm border-0" [(ngModel)]="fromDate" />
+    <span class="text-muted">to</span>
+    <input type="date" class="form-control form-control-sm border-0" [(ngModel)]="toDate" />
+    <button class="btn btn-primary btn-sm ms-2" (click)="loadReports()">Update</button>
+  </div>
+</app-page-header>
+
+<app-spinner *ngIf="loading"></app-spinner>
+
+<div class="row g-4" *ngIf="!loading && revenue && bookings">
+
+  <!-- Revenue Section -->
+  <div class="col-lg-8">
+    <div class="vr-card h-100">
+      <div class="vr-card-header">
+        <h3><i class="bi bi-graph-up-arrow text-success"></i> Revenue Overview</h3>
+      </div>
+      <div class="row text-center mb-4">
+        <div class="col-4 border-end">
+          <div class="text-muted small text-uppercase mb-1">Total Revenue</div>
+          <h3 class="text-success mb-0">₹{{ revenue.totalRevenue | number }}</h3>
+        </div>
+        <div class="col-4 border-end">
+          <div class="text-muted small text-uppercase mb-1">Monthly</div>
+          <h4 class="mb-0">₹{{ revenue.monthlyRevenue | number }}</h4>
+        </div>
+        <div class="col-4">
+          <div class="text-muted small text-uppercase mb-1">Daily</div>
+          <h4 class="mb-0">₹{{ revenue.dailyRevenue | number }}</h4>
+        </div>
+      </div>
+
+      <!-- Simulated Chart Bar Area -->
+      <div class="chart-area mt-4">
+        <div class="d-flex align-items-end justify-content-between h-100 gap-2">
+          <div *ngFor="let dp of revenue.dataPoints" class="chart-bar-wrap" [title]="'₹' + dp.amount">
+            <div class="chart-bar bg-primary"
+                 [style.height.%]="(dp.amount / revenue.totalRevenue) * 100 || 5">
+            </div>
+            <div class="chart-label">{{ dp.date | date:'dd MMM' }}</div>
+          </div>
+          <div *ngIf="revenue.dataPoints.length === 0" class="w-100 text-center text-muted py-5">
+            No revenue data in this period.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bookings Summary -->
+  <div class="col-lg-4">
+    <div class="vr-card h-100">
+      <div class="vr-card-header">
+        <h3><i class="bi bi-calendar-check text-primary"></i> Bookings</h3>
+      </div>
+      <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+        <span class="text-muted">Total Bookings</span>
+        <span class="fw-bold fs-4">{{ bookings.totalBookings }}</span>
+      </div>
+
+      <div class="status-list">
+        <div class="d-flex justify-content-between mb-2">
+          <span><i class="bi bi-circle-fill text-success me-2" style="font-size: 8px;"></i> Completed</span>
+          <span class="fw-semibold">{{ bookings.completedBookings }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span><i class="bi bi-circle-fill text-warning me-2" style="font-size: 8px;"></i> Active</span>
+          <span class="fw-semibold">{{ bookings.activeBookings }}</span>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span><i class="bi bi-circle-fill text-danger me-2" style="font-size: 8px;"></i> Cancelled</span>
+          <span class="fw-semibold">{{ bookings.cancelledBookings }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vehicle Utilization -->
+  <div class="col-12">
+    <div class="vr-card">
+      <div class="vr-card-header">
+        <h3><i class="bi bi-car-front text-info"></i> Vehicle Utilization</h3>
+      </div>
+      <table class="vr-table">
+        <thead>
+          <tr>
+            <th>Vehicle</th>
+            <th>Category</th>
+            <th>Total Bookings</th>
+            <th>Utilization Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let v of utilization">
+            <td>
+              <div class="fw-semibold">{{ v.vehicleName }}</div>
+              <div class="small text-muted">{{ v.registrationNumber }}</div>
+            </td>
+            <td><span class="vr-badge vr-badge-neutral">{{ v.categoryName }}</span></td>
+            <td>{{ v.totalBookings }}</td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="progress flex-grow-1" style="height: 6px;">
+                  <div class="progress-bar bg-info" [style.width.%]="v.utilizationRate"></div>
+                </div>
+                <span class="small fw-bold">{{ v.utilizationRate }}%</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

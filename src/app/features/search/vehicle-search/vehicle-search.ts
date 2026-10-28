@@ -11,14 +11,14 @@ import { CategoryService } from '../../../core/services/category.service';
 import { VehicleSearchService } from '../../../core/services/vehicle-search.service';
 import { localInputFromNow, toUtcIso } from '../../../core/utils/date.util';
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
-import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 
 const PAGE_SIZE = 12;
 
 @Component({
   selector: 'app-vehicle-search',
-  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, PageHeader, LoadingSpinner],
+  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, LoadingSpinner],
   templateUrl: './vehicle-search.html',
+  styleUrl: './vehicle-search.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VehicleSearch implements OnInit {

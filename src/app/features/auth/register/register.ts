@@ -49,7 +49,9 @@ export class Register {
     const { phone, ...rest } = this.form.getRawValue();
 
     this.auth.register({ ...rest, phone: phone || undefined }).subscribe({
-      next: () => this.router.navigateByUrl('/'),
+      next: () => this.router.navigateByUrl(
+        this.auth.role() === 'Customer' ? '/search' : '/'
+      ),
       error: err => {
         this.error.set(err.message);
         this.loading.set(false);

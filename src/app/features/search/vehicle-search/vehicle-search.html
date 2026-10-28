@@ -1,7 +1,13 @@
-<app-page-header title="Find a vehicle"
-                 subtitle="Pick your dates to see what is available and what it costs" />
+<section class="search-welcome">
+  <div>
+    <span class="search-eyebrow"><i class="bi bi-compass"></i> Your next trip starts here</span>
+    <h1>Find a vehicle that fits your journey.</h1>
+    <p>Compare vehicles, choose your dates, and find the right ride for the road ahead.</p>
+  </div>
+  <div class="welcome-icon" aria-hidden="true"><i class="bi bi-car-front-fill"></i></div>
+</section>
 
-<form class="card filters" [formGroup]="form" (ngSubmit)="search()">
+<form class="card filters vehicle-filters" [formGroup]="form" (ngSubmit)="search()">
   <div class="form-group">
     <label class="form-label" for="from">Pickup</label>
     <input id="from" class="form-control" type="datetime-local" formControlName="from" [min]="minDate" />
@@ -85,15 +91,23 @@
 @if (loading()) {
   <app-loading-spinner message="Searching vehicles..." />
 } @else if (results().length === 0) {
-  <div class="card empty-state">
+  <div class="card empty-state vehicle-empty">
+    <span class="empty-icon"><i class="bi bi-car-front"></i></span>
     <h3>No vehicles found</h3>
-    <p>Try different dates, or remove some of the filters.</p>
+    <p>Try different dates or remove some filters to see more available vehicles.</p>
+    <button type="button" class="btn btn-secondary" (click)="clear()">Clear filters</button>
   </div>
 } @else {
-  <p class="results-meta">
-    {{ totalCount() }} vehicle{{ totalCount() === 1 ? '' : 's' }}
-    @if (searched().from) { available for your dates }
-  </p>
+  <div class="results-heading">
+    <div>
+      <h2>Available vehicles</h2>
+      <p class="results-meta">
+        {{ totalCount() }} vehicle{{ totalCount() === 1 ? '' : 's' }}
+        @if (searched().from) { available for your dates }
+      </p>
+    </div>
+    <span class="results-count"><i class="bi bi-check-circle-fill"></i> Ready to book</span>
+  </div>
 
   <div class="vehicle-grid">
     @for (v of results(); track v.vehicleId) {
@@ -108,12 +122,13 @@
               <path d="M5 17h14M5 17a2 2 0 1 0 4 0M15 17a2 2 0 1 0 4 0M3 17v-5l2-5h14l2 5v5M3 12h18" />
             </svg>
           }
+          <span class="vehicle-category">{{ v.categoryName }}</span>
         </div>
 
         <div class="vehicle-card__body">
           <div>
             <h3 class="vehicle-card__title">{{ v.make }} {{ v.model }} ({{ v.year }})</h3>
-            <span class="text-muted">{{ v.categoryName }}</span>
+            <span class="vehicle-location"><i class="bi bi-geo-alt"></i> {{ v.branchName }}, {{ v.branchCity }}</span>
           </div>
 
           <div class="chips">
@@ -127,19 +142,18 @@
         </div>
 
         <div class="vehicle-card__foot">
-          <span>{{ v.branchName }}, {{ v.branchCity }}</span>
-
           @if (v.quote) {
             <span class="vehicle-card__price">
               <strong>{{ v.quote.totalAmount | currency:'INR':'symbol':'1.0-0' }}</strong>
-              total incl. GST
+              <small>total incl. GST</small>
             </span>
           } @else {
             <span class="vehicle-card__price">
               <strong>{{ v.dailyRate | currency:'INR':'symbol':'1.0-0' }}</strong>
-              per day
+              <small>per day</small>
             </span>
           }
+          <span class="vehicle-card__action">View details <i class="bi bi-arrow-right"></i></span>
         </div>
       </a>
     }

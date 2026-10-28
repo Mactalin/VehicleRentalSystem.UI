@@ -1,0 +1,88 @@
+<app-page-header title="Promotional Offers" subtitle="Create seasonal deals and banners.">
+  <button class="btn btn-primary" (click)="openAddModal()">
+    <i class="bi bi-plus-lg me-2"></i> Add Offer
+  </button>
+</app-page-header>
+
+<app-spinner *ngIf="loading"></app-spinner>
+
+<app-empty-state *ngIf="!loading && offers.length === 0" icon="bi-gift" title="No offers running" message="Create an offer to attract more customers."></app-empty-state>
+
+<div class="row g-4" *ngIf="!loading && offers.length > 0">
+  <div class="col-md-6" *ngFor="let o of offers">
+    <div class="vr-card p-0 overflow-hidden offer-card">
+      <div class="offer-banner" [style.background-image]="o.bannerImageUrl ? 'url(' + o.bannerImageUrl + ')' : 'none'">
+        <div class="offer-badge">{{ o.discountPercentage }}% OFF</div>
+        <div class="offer-overlay"></div>
+      </div>
+      <div class="p-4">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h4 class="mb-0">{{ o.title }}</h4>
+          <span class="vr-badge" [ngClass]="o.isActive ? 'vr-badge-success' : 'vr-badge-neutral'">
+            {{ o.isActive ? 'Active' : 'Draft' }}
+          </span>
+        </div>
+        <p class="text-muted small mb-4">{{ o.description }}</p>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="small text-muted">
+            <i class="bi bi-calendar-event me-1"></i>
+            {{ o.startDate | date:'mediumDate' }} - {{ o.endDate | date:'mediumDate' }}
+          </div>
+          <button class="btn btn-sm btn-light text-danger" (click)="delete(o.id)"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="vr-modal-backdrop" *ngIf="showModal">
+  <div class="vr-modal">
+    <div class="vr-modal-header">
+      <h3>Create Offer</h3>
+      <button class="btn-close" (click)="showModal = false"></button>
+    </div>
+    <div class="vr-modal-body">
+      <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+      <div class="mb-3">
+        <label class="form-label">Offer Title</label>
+        <input type="text" class="form-control" [(ngModel)]="model.title" placeholder="e.g. Diwali Sale" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" [(ngModel)]="model.description" rows="2"></textarea>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <label class="form-label">Discount %</label>
+          <input type="number" class="form-control" [(ngModel)]="model.discountPercentage" />
+        </div>
+        <div class="col-6">
+          <label class="form-label">Max Discount (₹)</label>
+          <input type="number" class="form-control" [(ngModel)]="model.maxDiscountAmount" placeholder="No limit" />
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-6">
+          <label class="form-label">Start Date</label>
+          <input type="date" class="form-control" [(ngModel)]="model.startDate" />
+        </div>
+        <div class="col-6">
+          <label class="form-label">End Date</label>
+          <input type="date" class="form-control" [(ngModel)]="model.endDate" />
+        </div>
+      </div>
+    </div>
+    <div class="vr-modal-footer">
+      <button class="btn btn-light" (click)="showModal = false">Cancel</button>
+      <button class="btn btn-primary" (click)="save()" [disabled]="submitting || !model.title">
+        {{ submitting ? 'Saving...' : 'Save Offer' }}
+      </button>
+    </div>
+  </div>
+</div>

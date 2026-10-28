@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthResponseDto, ChangePasswordDto, LoginDto, RegisterDto, UserDto } from '../models/auth.models';
@@ -20,8 +21,13 @@ export class AuthService {
   private _user = signal<UserDto | null>(this.readUser());
 
   readonly user = this._user.asReadonly();
+  readonly currentUser$ = toObservable(this._user);
   readonly isLoggedIn = computed(() => !!this._user() && !!this.token);
   readonly role = computed(() => this._user()?.role ?? null);
+
+  currentUser(): UserDto | null {
+    return this._user();
+  }
 
   get token(): string | null {
     return this.isBrowser ? localStorage.getItem(TOKEN_KEY) : null;

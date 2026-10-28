@@ -1,0 +1,23 @@
+.vr-empty {
+  display: grid;
+  justify-items: center;
+  gap: 9px;
+  padding: clamp(32px, 6vw, 64px) 20px;
+  text-align: center;
+}
+
+.vr-empty-icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  margin-bottom: 5px;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: 18px;
+  font-size: 24px;
+  place-items: center;
+}
+
+.vr-empty h4 { margin: 0; color: var(--text); font-size: 17px; }
+.vr-empty p { max-width: 420px; margin: 0; color: var(--text-muted); line-height: 1.55; }
+.vr-empty-actions { display: flex; gap: 8px; margin-top: 8px; }

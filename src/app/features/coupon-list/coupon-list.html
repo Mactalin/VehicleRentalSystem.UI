@@ -1,0 +1,143 @@
+<app-page-header title="Coupons" subtitle="Manage discounts and promo codes.">
+  <button class="btn btn-primary" (click)="openAddModal()">
+    <i class="bi bi-plus-lg me-2"></i> Create Coupon
+  </button>
+</app-page-header>
+
+<div class="row g-4">
+  <!-- Left: Coupon List -->
+  <div class="col-lg-8">
+    <div class="vr-card p-0 overflow-hidden">
+      <app-spinner *ngIf="loading"></app-spinner>
+
+      <app-empty-state *ngIf="!loading && coupons.length === 0" icon="bi-ticket" title="No coupons yet" message="Create a promo code to boost sales."></app-empty-state>
+
+      <table class="vr-table mb-0" *ngIf="!loading && coupons.length > 0">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Discount</th>
+            <th>Min. Spend</th>
+            <th>Valid Until</th>
+            <th>Uses</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of coupons">
+            <td><strong class="text-primary">{{ c.code }}</strong></td>
+            <td>
+              <span *ngIf="c.discountType === 'Percentage'">{{ c.discountValue }}%</span>
+              <span *ngIf="c.discountType === 'Fixed'">₹{{ c.discountValue }}</span>
+            </td>
+            <td>₹{{ c.minOrderAmount }}</td>
+            <td>{{ c.validTo | date:'mediumDate' }}</td>
+            <td>{{ c.usedCount }} / {{ c.maxUses || '∞' }}</td>
+            <td>
+              <span class="vr-badge"
+                [ngClass]="c.isActive ? 'vr-badge-success' : 'vr-badge-danger'">
+                {{ c.isActive ? 'Active' : 'Disabled' }}
+              </span>
+            </td>
+            <td class="text-end">
+              <button class="btn btn-sm btn-light text-danger" (click)="delete(c.id)"><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Right: Validation Widget -->
+  <div class="col-lg-4">
+    <div class="vr-card bg-light border-0 validate-widget">
+      <h4 class="mb-3"><i class="bi bi-lightning-charge-fill text-warning me-2"></i> Test a Coupon</h4>
+      <p class="text-muted small mb-4">Enter a code to test the backend validation logic.</p>
+
+      <div class="mb-3">
+        <label class="form-label">Coupon Code</label>
+        <input type="text" class="form-control text-uppercase" placeholder="e.g. SUMMER50" [(ngModel)]="validateCode" />
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Order Amount (₹)</label>
+        <input type="number" class="form-control" [(ngModel)]="validateAmount" />
+      </div>
+
+      <button class="btn btn-dark w-100 mb-3" (click)="validateCoupon()" [disabled]="validating || !validateCode">
+        {{ validating ? 'Checking...' : 'Apply Coupon' }}
+      </button>
+
+      <!-- Result -->
+      <div *ngIf="validationResult" class="alert mt-3 mb-0 shadow-sm"
+           [ngClass]="validationResult.isValid ? 'alert-success' : 'alert-danger'">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi" [ngClass]="validationResult.isValid ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+          <strong>{{ validationResult.message }}</strong>
+        </div>
+        <div class="mt-2 fs-5 fw-bold" *ngIf="validationResult.isValid">
+          Discount: ₹{{ validationResult.discountAmount }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="vr-modal-backdrop" *ngIf="showModal">
+  <div class="vr-modal">
+    <div class="vr-modal-header">
+      <h3>Create Coupon</h3>
+      <button class="btn-close" (click)="showModal = false"></button>
+    </div>
+    <div class="vr-modal-body">
+      <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+      <div class="mb-3">
+        <label class="form-label">Coupon Code</label>
+        <input type="text" class="form-control text-uppercase" [(ngModel)]="model.code" placeholder="SUMMER2026" />
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <label class="form-label">Type</label>
+          <select class="form-select" [(ngModel)]="model.discountType">
+            <option *ngFor="let t of discountTypes" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+        <div class="col-6">
+          <label class="form-label">Value</label>
+          <input type="number" class="form-control" [(ngModel)]="model.discountValue" />
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <label class="form-label">Valid From</label>
+          <input type="date" class="form-control" [(ngModel)]="model.validFrom" />
+        </div>
+        <div class="col-6">
+          <label class="form-label">Valid To</label>
+          <input type="date" class="form-control" [(ngModel)]="model.validTo" />
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-6">
+          <label class="form-label">Min. Spend (₹)</label>
+          <input type="number" class="form-control" [(ngModel)]="model.minOrderAmount" />
+        </div>
+        <div class="col-6">
+          <label class="form-label">Max Uses</label>
+          <input type="number" class="form-control" [(ngModel)]="model.maxUses" placeholder="Unlimited" />
+        </div>
+      </div>
+    </div>
+    <div class="vr-modal-footer">
+      <button class="btn btn-light" (click)="showModal = false">Cancel</button>
+      <button class="btn btn-primary" (click)="save()" [disabled]="submitting || !model.code">
+        {{ submitting ? 'Saving...' : 'Save Coupon' }}
+      </button>
+    </div>
+  </div>
+</div>

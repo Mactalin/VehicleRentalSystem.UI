@@ -84,6 +84,14 @@ const NAV: NavGroup[] = [
   {
     label: 'Administration',
     items: [
+      { label: 'Drivers', path: '/drivers', icon: ICONS.users, roles: ['Admin', 'Manager', 'Staff'] },
+      { label: 'Services', path: '/services', icon: ICONS.wrench, roles: ['Admin', 'Manager', 'Staff'] },
+      { label: 'Coupons', path: '/coupons', icon: ICONS.tag, roles: ['Admin', 'Manager', 'Staff'] },
+      { label: 'Offers', path: '/offers', icon: ICONS.quote, roles: ['Admin', 'Manager', 'Staff'] },
+      { label: 'Reviews', path: '/reviews', icon: ICONS.fileAlert, roles: ['Admin', 'Manager', 'Staff'] },
+      { label: 'Complaints', path: '/complaints', icon: ICONS.fileAlert, roles: ['Admin', 'Manager', 'Staff'] },
+      { label: 'Notifications', path: '/notifications', icon: ICONS.user, roles: ['Admin', 'Manager', 'Staff'] },
+      { label: 'Reports', path: '/reports', icon: ICONS.receipt, roles: ['Admin', 'Manager', 'Staff'] },
       { label: 'Categories & pricing', path: '/categories', icon: ICONS.tag, roles: ['Admin', 'Manager'] },
       { label: 'Users', path: '/users', icon: ICONS.users, roles: ['Admin', 'Manager'] }
     ]

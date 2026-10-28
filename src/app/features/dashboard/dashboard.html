@@ -1,0 +1,105 @@
+<section class="dashboard-heading">
+  <div>
+    <span class="dashboard-eyebrow"><i class="bi bi-activity"></i> Operations command center</span>
+    <h1>Dashboard overview</h1>
+    <p>See the essentials at a glance and keep your fleet moving.</p>
+  </div>
+  <div class="dashboard-live"><span></span> Live data</div>
+</section>
+
+<app-spinner *ngIf="loading"></app-spinner>
+
+<section *ngIf="!loading && error" class="dashboard-error alert alert-warning" role="alert">
+  <i class="bi bi-exclamation-triangle-fill"></i>
+  <div>
+    <strong>Dashboard data is unavailable.</strong>
+    <span>{{ error }}</span>
+  </div>
+  <button type="button" class="btn btn-sm btn-outline-warning" (click)="loadStats()">
+    <i class="bi bi-arrow-repeat me-1"></i> Retry
+  </button>
+</section>
+
+<section *ngIf="!loading && stats" class="dashboard-content">
+  <div class="row g-3 g-xl-4">
+    <div class="col-md-6 col-xl-3">
+      <article class="stat-card stat-card--revenue">
+        <div class="stat-card-top"><span class="stat-icon"><i class="bi bi-currency-rupee"></i></span><i class="bi bi-arrow-up-right stat-arrow"></i></div>
+        <span class="stat-label">Monthly revenue</span>
+        <strong class="stat-value">&#8377;{{ stats.monthlyRevenue | number }}</strong>
+        <span class="stat-caption">Revenue recorded this month</span>
+      </article>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+      <article class="stat-card stat-card--bookings">
+        <div class="stat-card-top"><span class="stat-icon"><i class="bi bi-calendar2-check"></i></span><i class="bi bi-arrow-up-right stat-arrow"></i></div>
+        <span class="stat-label">Today's bookings</span>
+        <strong class="stat-value">{{ stats.todayBookings }}</strong>
+        <span class="stat-caption">Bookings created today</span>
+      </article>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+      <article class="stat-card stat-card--fleet">
+        <div class="stat-card-top"><span class="stat-icon"><i class="bi bi-car-front-fill"></i></span><i class="bi bi-arrow-up-right stat-arrow"></i></div>
+        <span class="stat-label">Fleet available</span>
+        <strong class="stat-value">{{ stats.availableVehicles }}<small>/{{ stats.totalVehicles }}</small></strong>
+        <span class="stat-caption">Vehicles ready for the road</span>
+      </article>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+      <article class="stat-card stat-card--customers">
+        <div class="stat-card-top"><span class="stat-icon"><i class="bi bi-people-fill"></i></span><i class="bi bi-arrow-up-right stat-arrow"></i></div>
+        <span class="stat-label">Total customers</span>
+        <strong class="stat-value">{{ stats.totalCustomers | number }}</strong>
+        <span class="stat-caption">Customers in your database</span>
+      </article>
+    </div>
+  </div>
+
+  <div class="row g-3 g-xl-4 dashboard-lower">
+    <div class="col-lg-7">
+      <article class="fleet-readiness">
+        <div class="fleet-readiness-copy">
+          <span class="section-label">Fleet readiness</span>
+          <h2>Your fleet is ready for the day.</h2>
+          <p>Monitor availability and maintenance before the next booking comes in.</p>
+          <div class="availability-track" aria-label="Fleet availability">
+            <div class="availability-fill" [style.width.%]="stats.totalVehicles ? (stats.availableVehicles / stats.totalVehicles) * 100 : 0"></div>
+          </div>
+          <div class="availability-legend">
+            <span><i class="available-dot"></i>{{ stats.availableVehicles }} available now</span>
+            <span><i class="maintenance-dot"></i>{{ stats.vehiclesUnderMaintenance }} in maintenance</span>
+          </div>
+        </div>
+        <div class="fleet-rate">
+          <span>{{ stats.totalVehicles ? (stats.availableVehicles / stats.totalVehicles | percent:'1.0-0') : '—' }}</span>
+          <small>available</small>
+        </div>
+      </article>
+    </div>
+
+    <div class="col-lg-5">
+      <article class="operations-summary">
+        <div class="summary-header"><span class="section-label">At a glance</span><i class="bi bi-three-dots"></i></div>
+        <div class="summary-row">
+          <span class="summary-icon summary-icon--purple"><i class="bi bi-key-fill"></i></span>
+          <span>Active rentals <small>On the road now</small></span>
+          <strong>{{ stats.activeRentals }}</strong>
+        </div>
+        <div class="summary-row">
+          <span class="summary-icon summary-icon--amber"><i class="bi bi-wallet2"></i></span>
+          <span>Pending payments <small>Awaiting collection</small></span>
+          <strong>&#8377;{{ stats.pendingPayments | number }}</strong>
+        </div>
+        <div class="summary-row">
+          <span class="summary-icon summary-icon--blue"><i class="bi bi-tools"></i></span>
+          <span>Maintenance <small>Vehicles being serviced</small></span>
+          <strong>{{ stats.vehiclesUnderMaintenance }}</strong>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

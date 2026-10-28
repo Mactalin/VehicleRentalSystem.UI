@@ -1,0 +1,54 @@
+<header class="app-header">
+  <div class="header-context">
+    <span class="header-context-label">Operations</span>
+    <span class="header-context-status"><i class="bi bi-circle-fill"></i> System online</span>
+  </div>
+
+  <label class="header-search">
+    <i class="bi bi-search"></i>
+    <input type="search" placeholder="Search drivers, services, offers..." aria-label="Search the portal" />
+    <kbd>⌘ K</kbd>
+  </label>
+
+  <div class="header-actions">
+    <a class="header-icon" routerLink="/notifications" title="Notifications" aria-label="View notifications">
+      <i class="bi bi-bell"></i>
+      <span *ngIf="hasUnreadNotifications" class="notification-indicator" aria-hidden="true"></span>
+    </a>
+    <div class="header-divider" aria-hidden="true"></div>
+    <div class="header-user-wrap" #userMenu>
+      <button class="header-user" type="button" (click)="toggleUserPopup()" [attr.aria-expanded]="showUserPopup" aria-haspopup="dialog">
+        <div class="header-avatar">{{ (auth.currentUser()?.email || 'A')[0].toUpperCase() }}</div>
+        <div class="header-user-info">
+          <div class="name">{{ auth.currentUser()?.fullName || 'Administrator' }}</div>
+          <div class="role">{{ auth.currentUser()?.role || 'Admin' }}</div>
+        </div>
+        <i class="bi header-chevron" [ngClass]="showUserPopup ? 'bi-chevron-up' : 'bi-chevron-down'" aria-hidden="true"></i>
+      </button>
+
+      <section class="user-popover" *ngIf="showUserPopup" role="dialog" aria-label="Signed-in user details">
+        <div class="user-popover-profile">
+          <div class="user-popover-avatar">{{ (auth.currentUser()?.email || 'A')[0].toUpperCase() }}</div>
+          <div>
+            <strong>{{ auth.currentUser()?.fullName || 'Administrator' }}</strong>
+            <span>{{ auth.currentUser()?.role || 'Admin' }}</span>
+          </div>
+          <span class="user-online"><i class="bi bi-circle-fill"></i> Online</span>
+        </div>
+
+        <div class="user-popover-detail">
+          <i class="bi bi-envelope"></i>
+          <span>Email</span>
+          <strong>{{ auth.currentUser()?.email || 'Not available' }}</strong>
+        </div>
+        <div class="user-popover-detail">
+          <i class="bi bi-shield-check"></i>
+          <span>Access</span>
+          <strong>{{ auth.currentUser()?.role || 'Administrator' }}</strong>
+        </div>
+
+        <p class="user-popover-message"><i class="bi bi-stars"></i> You are signed in and ready to manage your rental operations.</p>
+      </section>
+    </div>
+  </div>
+</header>

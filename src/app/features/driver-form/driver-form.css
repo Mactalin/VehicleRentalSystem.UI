@@ -1,0 +1,15 @@
+:host { display: block; }
+
+.vr-card { max-width: 880px; padding: 28px; }
+.form-label { display: block; margin-bottom: 7px; color: var(--text); }
+.form-control, .form-select { width: 100%; }
+.form-text { margin-top: 6px; color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+.form-check { display: flex; align-items: center; gap: 9px; min-height: 40px; }
+.form-check-input { width: 17px; height: 17px; accent-color: var(--primary); }
+.form-check-label { font-weight: 500; }
+hr { margin: 24px 0; border: 0; border-top: 1px solid var(--border); }
+
+@media (max-width: 575px) {
+  .vr-card { padding: 18px; }
+  .d-flex.gap-2 > .btn { flex: 1; }
+}

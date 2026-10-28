@@ -1,0 +1,22 @@
+.notif-item { border-left: 4px solid transparent; cursor: default; transition: background-color .16s ease; }
+.notif-item:hover { background-color: #f8fafc !important; }
+.notif-item.bg-primary-subtle { border-left-color: var(--primary); }
+
+.notif-icon-box { width: 48px; height: 48px; flex: 0 0 48px; }
+.notif-item h6 { color: var(--text); font-size: 14px; }
+.notif-item p { line-height: 1.55; }
+.notif-item .btn { width: 34px; min-width: 34px; height: 34px; padding: 0; }
+.notification-list-content { max-width: 900px; }
+
+.unread-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.2);
+}
+
+@media (max-width: 575px) {
+  .notif-item { align-items: flex-start; gap: 12px !important; padding: 16px !important; }
+  .notif-icon-box { width: 38px; height: 38px; flex-basis: 38px; }
+  .notif-item > .d-flex.flex-column { flex-direction: row; gap: 8px; }
+  .notification-list-content { max-width: 100%; }
+}

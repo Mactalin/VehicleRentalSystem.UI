@@ -1,0 +1,56 @@
+<app-page-header title="Notifications" subtitle="System alerts, booking updates, and reminders.">
+  <button class="btn btn-outline-secondary" *ngIf="unreadCount > 0" (click)="markAllAsRead()">
+    <i class="bi bi-check2-all me-2"></i> Mark all as read
+  </button>
+</app-page-header>
+
+<div class="vr-card p-0 overflow-hidden" style="max-width: 900px;">
+
+  <div class="p-3 border-bottom d-flex gap-2">
+    <button class="btn btn-sm" [ngClass]="filter === 'all' ? 'btn-primary' : 'btn-light'" (click)="filter = 'all'">
+      All
+    </button>
+    <button class="btn btn-sm" [ngClass]="filter === 'unread' ? 'btn-primary' : 'btn-light'" (click)="filter = 'unread'">
+      Unread
+      <span class="badge bg-danger ms-1 rounded-pill" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+    </button>
+  </div>
+
+  <app-spinner *ngIf="loading"></app-spinner>
+
+  <app-empty-state *ngIf="!loading && filteredNotifications.length === 0" icon="bi-inbox" title="Inbox Zero!" message="You have no notifications right now."></app-empty-state>
+
+  <div class="list-group list-group-flush" *ngIf="!loading && filteredNotifications.length > 0">
+    <div *ngFor="let n of filteredNotifications"
+         class="list-group-item p-4 d-flex gap-3 notif-item transition-all"
+         [ngClass]="{'bg-primary-subtle': !n.isRead}">
+
+      <!-- Icon -->
+      <div class="notif-icon-box bg-white border rounded-circle d-flex align-items-center justify-content-center shadow-sm">
+        <i class="bi fs-5" [ngClass]="getIcon(n.event)"></i>
+      </div>
+
+      <!-- Content -->
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between align-items-start mb-1">
+          <h6 class="mb-0 fw-bold" [ngClass]="{'text-primary': !n.isRead}">{{ n.title }}</h6>
+          <span class="text-muted small">{{ n.createdAt | date:'shortTime' }}</span>
+        </div>
+        <p class="mb-1 text-muted">{{ n.message }}</p>
+        <div class="d-flex align-items-center gap-2 mt-2">
+          <span class="badge bg-light text-dark border">{{ n.type }}</span>
+          <span class="text-muted small" *ngIf="n.event">{{ n.event }}</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="d-flex flex-column align-items-center justify-content-center">
+        <div class="unread-dot" *ngIf="!n.isRead"></div>
+        <button class="btn btn-sm btn-light mt-2" *ngIf="!n.isRead" (click)="markAsRead(n.id, $event)" title="Mark read">
+          <i class="bi bi-check2"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

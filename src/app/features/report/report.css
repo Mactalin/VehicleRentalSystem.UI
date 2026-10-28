@@ -1,0 +1,32 @@
+.chart-area {
+  height: 220px;
+  padding: 12px 8px 0;
+  background: linear-gradient(180deg, #f7f8ff, #fff);
+  border-bottom: 1px solid var(--border);
+  border-radius: 10px;
+}
+.chart-bar-wrap {
+  flex: 1; display: flex; flex-direction: column; justify-content: flex-end;
+  align-items: center; height: 100%; min-width: 16px; position: relative;
+}
+.chart-bar {
+  width: min(100%, 40px); min-height: 4px; border-radius: 6px 6px 0 0;
+  transition: height 0.5s ease; opacity: 0.82;
+}
+.chart-bar:hover { opacity: 1; box-shadow: 0 0 10px rgba(79,70,229,0.4); }
+.chart-label {
+  font-size: 10px; color: #71798c; margin-top: 8px;
+  transform: rotate(-45deg); white-space: nowrap;
+}
+
+.vr-card-header { display: flex; align-items: center; margin-bottom: 22px; }
+.vr-card-header h3 { display: flex; align-items: center; gap: 9px; font-size: 17px; }
+.vr-card .progress { height: 8px; overflow: hidden; background: #e9edf5; border-radius: 999px; }
+.vr-card .progress-bar { height: 100%; background: #0284c7; border-radius: inherit; }
+.vr-card .form-control { width: auto; }
+.status-list { display: grid; gap: 12px; }
+
+@media (max-width: 575px) {
+  .chart-area { height: 180px; }
+  .chart-label { font-size: 9px; }
+}

@@ -1,0 +1,65 @@
+<app-page-header title="Customer Reviews" subtitle="Monitor feedback and ratings for vehicles and drivers."></app-page-header>
+
+<div class="vr-card p-0 overflow-hidden">
+  <div class="p-4 border-bottom d-flex justify-content-between align-items-center bg-light">
+    <h5 class="mb-0 fw-bold"><i class="bi bi-star-fill text-warning me-2"></i> All Reviews</h5>
+    <div class="d-flex gap-2 align-items-center">
+      <span class="text-muted small">Filter by rating:</span>
+      <select class="form-select form-select-sm" style="width: 120px;" [(ngModel)]="filterRating" (change)="loadReviews()">
+        <option [value]="0">All Stars</option>
+        <option [value]="5">5 Stars</option>
+        <option [value]="4">4 Stars</option>
+        <option [value]="3">3 Stars</option>
+        <option [value]="2">2 Stars</option>
+        <option [value]="1">1 Star</option>
+      </select>
+    </div>
+  </div>
+
+  <app-spinner *ngIf="loading"></app-spinner>
+
+  <app-empty-state *ngIf="!loading && reviews.length === 0" icon="bi-star" title="No reviews yet" message="Once customers complete bookings, their reviews will appear here."></app-empty-state>
+
+  <div class="table-responsive" *ngIf="!loading && reviews.length > 0">
+    <table class="vr-table mb-0">
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Rating</th>
+          <th>Feedback</th>
+          <th>Context</th>
+          <th>Date</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of reviews">
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="user-avatar-sm">{{ (r.customerName || 'C')[0] }}</div>
+              <span class="fw-semibold">{{ r.customerName || 'Customer #' + r.customerId }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="text-warning" style="font-size: 0.85rem;">
+              <i class="bi" *ngFor="let s of getStars(r.rating)" [ngClass]="s"></i>
+            </div>
+          </td>
+          <td>
+            <div style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" [title]="r.comment">
+              {{ r.comment || 'No comment provided.' }}
+            </div>
+          </td>
+          <td>
+            <span class="badge bg-light text-dark border" *ngIf="r.vehicleId">Vehicle #{{ r.vehicleId }}</span>
+            <span class="badge bg-light text-dark border ms-1" *ngIf="r.driverId">Driver #{{ r.driverId }}</span>
+          </td>
+          <td class="text-muted small">{{ r.postedAt | date:'mediumDate' }}</td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-light text-danger" (click)="deleteReview(r.id)"><i class="bi bi-trash"></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
