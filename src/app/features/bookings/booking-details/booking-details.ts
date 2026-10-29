@@ -12,7 +12,6 @@ import { PaymentService } from '../../../core/services/payment.service';
 import { methodLabel } from '../../../core/utils/payment.util';
 import { isHttpUrl } from '../../../core/utils/url.util';
 import { BookingTimeline } from '../../../shared/components/booking-timeline/booking-timeline/booking-timeline';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 import { ConfirmService } from '../../../shared/services/confirm.service';
@@ -21,7 +20,7 @@ import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 @Component({
   selector: 'app-booking-details',
   imports: [
-    RouterLink, DatePipe, CurrencyPipe, PageHeader, LoadingSpinner, StatusBadge,
+    RouterLink, DatePipe, CurrencyPipe, PageHeader, StatusBadge,
     EnumLabelPipe, BookingTimeline
   ],
   templateUrl: './booking-details.html',

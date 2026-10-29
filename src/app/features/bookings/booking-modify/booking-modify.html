@@ -3,7 +3,6 @@
 <app-page-header title="Modify booking" subtitle="Change your pickup and return times" />
 
 @if (loading()) {
-  <app-loading-spinner message="Loading booking..." />
 } @else if (booking(); as b) {
 
   @if (!modifiable()) {

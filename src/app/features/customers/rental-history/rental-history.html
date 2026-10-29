@@ -3,7 +3,6 @@
 </app-page-header>
 
 @if (loading()) {
-  <app-loading-spinner message="Loading your bookings..." />
 } @else if (error()) {
   <div class="alert alert-danger">{{ error() }}</div>
 } @else if (!hasProfile()) {

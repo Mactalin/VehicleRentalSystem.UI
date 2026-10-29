@@ -22,7 +22,6 @@
 }
 
 @if (loading()) {
-  <app-loading-spinner message="Loading bookings..." />
 } @else if (filtered().length === 0) {
   <div class="card empty-state">
     <h3>No bookings here</h3>

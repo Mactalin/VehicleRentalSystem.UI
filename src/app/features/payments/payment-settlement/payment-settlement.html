@@ -1,7 +1,6 @@
 <a class="back-link" routerLink="/payments">&larr; Payments</a>
 
 @if (loading()) {
-  <app-loading-spinner message="Loading settlement..." />
 } @else if (booking(); as b) {
   @if (settlement(); as s) {
 

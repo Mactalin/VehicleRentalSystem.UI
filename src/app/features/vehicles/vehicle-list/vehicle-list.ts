@@ -9,14 +9,13 @@ import { AuthService } from '../../../core/services/auth.service';
 import { BranchService } from '../../../core/services/branch.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { VehicleService } from '../../../core/services/vehicle.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
 @Component({
   selector: 'app-vehicle-list',
-  imports: [RouterLink, DecimalPipe, PageHeader, StatusBadge, LoadingSpinner, EnumLabelPipe],
+  imports: [RouterLink, DecimalPipe, PageHeader, StatusBadge, EnumLabelPipe],
   templateUrl: './vehicle-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

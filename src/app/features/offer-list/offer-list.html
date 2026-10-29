@@ -4,11 +4,10 @@
   </button>
 </app-page-header>
 
-<app-spinner *ngIf="loading"></app-spinner>
 
-<app-empty-state *ngIf="!loading && offers.length === 0" icon="bi-gift" title="No offers running" message="Create an offer to attract more customers."></app-empty-state>
+<app-empty-state *ngIf="!loading() && offers.length === 0" icon="bi-gift" title="No offers running" message="Create an offer to attract more customers."></app-empty-state>
 
-<div class="row g-4" *ngIf="!loading && offers.length > 0">
+<div class="row g-4" *ngIf="!loading() && offers.length > 0">
   <div class="col-md-6" *ngFor="let o of offers">
     <div class="vr-card p-0 overflow-hidden offer-card">
       <div class="offer-banner" [style.background-image]="o.bannerImageUrl ? 'url(' + o.bannerImageUrl + ')' : 'none'">

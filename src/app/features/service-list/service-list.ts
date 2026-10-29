@@ -1,22 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdditionalService, ServiceType, CreateAdditionalService } from '../../core/models/additional-service';
 import { AdditionalServiceApi } from '../../core/services/aditionalservice';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 
 @Component({
   selector: 'app-service-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, EmptyStateComponent, SpinnerComponent],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, EmptyStateComponent],
   templateUrl: './service-list.html',
   styleUrls: ['./service-list.css']
 })
 export class ServiceListComponent implements OnInit {
   services: AdditionalService[] = [];
-  loading = true;
+  loading = signal(true);
 
   // Modal state
   showModal = false;
@@ -43,10 +42,10 @@ export class ServiceListComponent implements OnInit {
   }
 
   loadServices(): void {
-    this.loading = true;
+    this.loading.set(true);
     this.service.getAll().subscribe({
-      next: (data) => { this.services = data; this.loading = false; },
-      error: () => this.loading = false
+      next: (data) => { this.services = data; this.loading.set(false); },
+      error: () => this.loading.set(false)
     });
   }
 

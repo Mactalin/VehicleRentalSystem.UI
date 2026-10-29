@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Complaint, ComplaintStatus } from '../../core/models/complaint';
@@ -6,18 +6,17 @@ import { AuthService } from '../../core/services/auth.service';
 import { ComplaintService } from '../../core/services/complaintservice';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 
 @Component({
   selector: 'app-complaint-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, EmptyStateComponent, SpinnerComponent],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, EmptyStateComponent],
   templateUrl: './complain-list.html',
   styleUrls: ['./complain-list.css']
 })
 export class ComplaintListComponent implements OnInit {
   complaints: Complaint[] = [];
-  loading = true;
+  loading = signal(true);
 
   // Modal State
   showModal = false;
@@ -33,10 +32,10 @@ export class ComplaintListComponent implements OnInit {
   }
 
   loadComplaints(): void {
-    this.loading = true;
+    this.loading.set(true);
     this.service.getAll().subscribe({
-      next: (data) => { this.complaints = data; this.loading = false; },
-      error: () => this.loading = false
+      next: (data) => { this.complaints = data; this.loading.set(false); },
+      error: () => this.loading.set(false)
     });
   }
 

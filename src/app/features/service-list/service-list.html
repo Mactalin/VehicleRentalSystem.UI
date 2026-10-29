@@ -4,17 +4,16 @@
   </button>
 </app-page-header>
 
-<app-spinner *ngIf="loading"></app-spinner>
 
 <app-empty-state
-  *ngIf="!loading && services.length === 0"
+  *ngIf="!loading() && services.length === 0"
   icon="bi-box"
   title="No services yet"
   message="Create your first add-on service to offer at checkout.">
 </app-empty-state>
 
 <!-- Card Grid Layout -->
-<div class="row g-4" *ngIf="!loading && services.length > 0">
+<div class="row g-4" *ngIf="!loading() && services.length > 0">
   <div class="col-md-6 col-lg-4" *ngFor="let s of services">
     <div class="vr-card h-100 p-4 service-card">
       <div class="d-flex justify-content-between align-items-start mb-3">

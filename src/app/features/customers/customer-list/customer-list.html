@@ -36,7 +36,6 @@
 }
 
 @if (loading()) {
-  <app-loading-spinner message="Loading customers..." />
 } @else if (customers().length === 0) {
   <div class="card empty-state">
     <h3>No customers found</h3>

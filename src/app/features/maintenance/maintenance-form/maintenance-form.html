@@ -5,7 +5,6 @@
   [subtitle]="isEdit ? 'Update the scheduled job' : 'Plan a service or repair for a vehicle'" />
 
 @if (loading()) {
-  <app-loading-spinner />
 } @else {
   <form class="card form-wide" [formGroup]="form" (ngSubmit)="submit()" novalidate>
     <div class="card-body">

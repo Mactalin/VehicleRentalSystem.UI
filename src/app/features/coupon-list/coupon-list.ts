@@ -1,22 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CouponService } from '../../core/services/couponservice';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 import { Coupon, CouponValidationResult, DiscountType, CreateCoupon } from '../../core/models/coupon';
 
 @Component({
   selector: 'app-coupon-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, SpinnerComponent, EmptyStateComponent],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, EmptyStateComponent],
   templateUrl: './coupon-list.html',
   styleUrls: ['./coupon-list.css']
 })
 export class CouponListComponent implements OnInit {
   coupons: Coupon[] = [];
-  loading = true;
+  loading = signal(true);
 
   // Validation Widget State
   validateCode = '';
@@ -45,10 +44,10 @@ export class CouponListComponent implements OnInit {
   }
 
   loadCoupons(): void {
-    this.loading = true;
+    this.loading.set(true);
     this.service.getAll().subscribe({
-      next: (data) => { this.coupons = data; this.loading = false; },
-      error: () => this.loading = false
+      next: (data) => { this.coupons = data; this.loading.set(false); },
+      error: () => this.loading.set(false)
     });
   }
 

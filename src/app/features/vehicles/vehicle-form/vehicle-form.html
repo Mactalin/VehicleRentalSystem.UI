@@ -3,7 +3,6 @@
   [subtitle]="isEdit ? 'Update the vehicle details' : 'Register a new vehicle in the fleet'" />
 
 @if (loading()) {
-  <app-loading-spinner />
 } @else {
   <form class="card form-wide" [formGroup]="form" (ngSubmit)="submit()" novalidate>
     <div class="card-body">

@@ -1,7 +1,6 @@
 <a class="back-link" routerLink="/customers">&larr; Back to customers</a>
 
 @if (loading()) {
-  <app-loading-spinner message="Loading customer..." />
 } @else if (customer(); as c) {
 
   <app-page-header [title]="c.fullName" subtitle="Review documents and manage this account">

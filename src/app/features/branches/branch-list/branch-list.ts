@@ -3,7 +3,6 @@ import { RouterLink } from '@angular/router';
 import { BranchDto, DayOfWeekName } from '../../../core/models/branch.models';
 import { AuthService } from '../../../core/services/auth.service';
 import { BranchService } from '../../../core/services/branch.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 import { ConfirmService } from '../../../shared/services/confirm.service';
@@ -14,7 +13,7 @@ const JS_DAYS: DayOfWeekName[] = [
 
 @Component({
   selector: 'app-branch-list',
-  imports: [RouterLink, PageHeader, StatusBadge, LoadingSpinner],
+  imports: [RouterLink, PageHeader, StatusBadge],
   templateUrl: './branch-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

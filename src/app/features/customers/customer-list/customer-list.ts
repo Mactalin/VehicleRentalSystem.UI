@@ -4,7 +4,6 @@ import { RouterLink } from '@angular/router';
 import { CustomerSummaryDto } from '../../../core/models/customer.models';
 import { CustomerStatus, VerificationStatus } from '../../../core/models/enums';
 import { CustomerService } from '../../../core/services/customer.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 
@@ -12,7 +11,7 @@ const PAGE_SIZE = 15;
 
 @Component({
   selector: 'app-customer-list',
-  imports: [RouterLink, DatePipe, PageHeader, LoadingSpinner, StatusBadge],
+  imports: [RouterLink, DatePipe, PageHeader, StatusBadge],
   templateUrl: './customer-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

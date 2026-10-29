@@ -13,22 +13,28 @@
     <div class="header-search" style="width: 300px;">
       <i class="bi bi-search"></i>
       <input type="text" placeholder="Search by name, license or phone..."
-             [(ngModel)]="searchTerm" (input)="onSearch()" />
+             [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
     </div>
   </div>
 
-  <app-spinner *ngIf="loading"></app-spinner>
+  <div class="alert alert-danger" *ngIf="actionError()">{{ actionError() }}</div>
+  <div class="alert alert-danger" *ngIf="loadError()">
+    {{ loadError() }}
+    <button type="button" class="btn btn-sm btn-outline-danger ms-3" (click)="loadDrivers()">
+      <i class="bi bi-arrow-repeat me-1"></i> Retry
+    </button>
+  </div>
 
   <!-- Empty State -->
   <app-empty-state
-    *ngIf="!loading && filteredDrivers.length === 0"
+    *ngIf="drivers() !== null && !loadError() && filteredDrivers().length === 0"
     icon="bi-person-badge"
     title="No drivers found"
     message="Try adjusting your search or add a new driver.">
   </app-empty-state>
 
   <!-- Table -->
-  <div class="table-responsive" *ngIf="!loading && filteredDrivers.length > 0">
+  <div class="table-responsive" *ngIf="!loadError() && filteredDrivers().length > 0">
     <table class="vr-table">
       <thead>
         <tr>
@@ -41,7 +47,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let driver of filteredDrivers">
+        <tr *ngFor="let driver of filteredDrivers()">
           <td>
             <div class="fw-semibold">{{ driver.fullName }}</div>
             <small class="text-muted">{{ driver.experienceYears }} years exp.</small>

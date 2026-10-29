@@ -16,11 +16,10 @@
     </button>
   </div>
 
-  <app-spinner *ngIf="loading"></app-spinner>
 
-  <app-empty-state *ngIf="!loading && filteredNotifications.length === 0" icon="bi-inbox" title="Inbox Zero!" message="You have no notifications right now."></app-empty-state>
+  <app-empty-state *ngIf="!loading() && filteredNotifications.length === 0" icon="bi-inbox" title="Inbox Zero!" message="You have no notifications right now."></app-empty-state>
 
-  <div class="list-group list-group-flush" *ngIf="!loading && filteredNotifications.length > 0">
+  <div class="list-group list-group-flush" *ngIf="!loading() && filteredNotifications.length > 0">
     <div *ngFor="let n of filteredNotifications"
          class="list-group-item p-4 d-flex gap-3 notif-item transition-all"
          [ngClass]="{'bg-primary-subtle': !n.isRead}">

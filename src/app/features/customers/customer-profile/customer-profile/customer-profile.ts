@@ -5,7 +5,6 @@ import { of, switchMap } from 'rxjs';
 import { CreateCustomerDto, CustomerDto } from '../../../../core/models/customer.models';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CustomerService } from '../../../../core/services/customer.service';
-import { LoadingSpinner } from '../../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../../shared/components/status-badge/status-badge/status-badge';
 
@@ -20,7 +19,7 @@ function adult(control: AbstractControl): ValidationErrors | null {
 
 @Component({
   selector: 'app-customer-profile',
-  imports: [ReactiveFormsModule, RouterLink, PageHeader, LoadingSpinner, StatusBadge],
+  imports: [ReactiveFormsModule, RouterLink, PageHeader, StatusBadge],
   templateUrl: './customer-profile.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

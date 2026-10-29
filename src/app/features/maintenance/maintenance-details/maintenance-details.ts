@@ -5,14 +5,13 @@ import { Router, RouterLink } from '@angular/router';
 import { MaintenanceDto } from '../../../core/models/maintenance.models';
 import { AuthService } from '../../../core/services/auth.service';
 import { MaintenanceService } from '../../../core/services/maintenance.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 import { ConfirmService } from '../../../shared/services/confirm.service';
 
 @Component({
   selector: 'app-maintenance-details',
-  imports: [RouterLink, ReactiveFormsModule, DatePipe, CurrencyPipe, PageHeader, StatusBadge, LoadingSpinner],
+  imports: [RouterLink, ReactiveFormsModule, DatePipe, CurrencyPipe, PageHeader, StatusBadge],
   templateUrl: './maintenance-details.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

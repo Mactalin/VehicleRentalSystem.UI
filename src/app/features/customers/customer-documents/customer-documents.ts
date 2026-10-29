@@ -7,7 +7,6 @@ import { KycDocumentType } from '../../../core/models/enums';
 import { CustomerService } from '../../../core/services/customer.service';
 import { toLocalInput } from '../../../core/utils/date.util';
 import { isHttpUrl } from '../../../core/utils/url.util';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
@@ -27,7 +26,7 @@ function licenceDates(group: AbstractControl): ValidationErrors | null {
 
 @Component({
   selector: 'app-customer-documents',
-  imports: [ReactiveFormsModule, DatePipe, PageHeader, LoadingSpinner, StatusBadge, EnumLabelPipe],
+  imports: [ReactiveFormsModule, DatePipe, PageHeader, StatusBadge, EnumLabelPipe],
   templateUrl: './customer-documents.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

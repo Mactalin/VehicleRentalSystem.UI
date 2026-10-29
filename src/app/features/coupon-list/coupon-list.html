@@ -8,11 +8,10 @@
   <!-- Left: Coupon List -->
   <div class="col-lg-8">
     <div class="vr-card p-0 overflow-hidden">
-      <app-spinner *ngIf="loading"></app-spinner>
 
-      <app-empty-state *ngIf="!loading && coupons.length === 0" icon="bi-ticket" title="No coupons yet" message="Create a promo code to boost sales."></app-empty-state>
+      <app-empty-state *ngIf="!loading() && coupons.length === 0" icon="bi-ticket" title="No coupons yet" message="Create a promo code to boost sales."></app-empty-state>
 
-      <table class="vr-table mb-0" *ngIf="!loading && coupons.length > 0">
+      <table class="vr-table mb-0" *ngIf="!loading() && coupons.length > 0">
         <thead>
           <tr>
             <th>Code</th>

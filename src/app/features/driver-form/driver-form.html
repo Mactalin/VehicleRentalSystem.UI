@@ -8,15 +8,23 @@
 
 <div class="vr-card" style="max-width: 800px;">
   <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+  <div class="alert alert-danger" *ngIf="loadingError">
+    {{ loadingError }}
+    <button type="button" class="btn btn-sm btn-outline-danger ms-3" (click)="loadDriver()">
+      <i class="bi bi-arrow-repeat me-1"></i> Retry loading
+    </button>
+  </div>
   <div class="alert alert-warning" *ngIf="notificationError">
     {{ notificationError }}
     <button type="button" class="btn btn-sm btn-outline-warning ms-3" (click)="retryNotification()" [disabled]="submitting">
       <i class="bi bi-arrow-repeat me-1"></i> Retry notification
     </button>
+    <button type="button" class="btn btn-sm btn-outline-secondary ms-2" (click)="goToDrivers()">
+      Go to Drivers
+    </button>
   </div>
-  <div class="vr-spinner" *ngIf="loading"><div class="spinner-border text-primary"></div></div>
 
-  <form (ngSubmit)="onSubmit()" *ngIf="!loading">
+  <form (ngSubmit)="onSubmit()" *ngIf="!loading() && !loadingError">
     <div class="row g-3">
 
       <div class="col-md-6">
@@ -82,7 +90,8 @@
 
     <div class="d-flex gap-2">
       <button type="submit" class="btn btn-primary" [disabled]="submitting || !!createdDriver">
-        <i class="bi bi-check2 me-2"></i> {{ isEdit ? 'Update Driver' : 'Save Driver' }}
+        <i class="bi bi-check2 me-2" *ngIf="!submitting"></i>
+        {{ submitting ? (createdDriver ? 'Sending notification...' : 'Saving...') : (isEdit ? 'Update Driver' : 'Save Driver') }}
       </button>
       <button type="button" class="btn btn-light" routerLink="/drivers">Cancel</button>
     </div>

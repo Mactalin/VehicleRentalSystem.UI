@@ -9,12 +9,11 @@ import { SaveVehicleDto } from '../../../core/models/vehicle.models';
 import { BranchService } from '../../../core/services/branch.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { VehicleService } from '../../../core/services/vehicle.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 
 @Component({
   selector: 'app-vehicle-form',
-  imports: [ReactiveFormsModule, RouterLink, PageHeader, LoadingSpinner],
+  imports: [ReactiveFormsModule, RouterLink, PageHeader],
   templateUrl: './vehicle-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

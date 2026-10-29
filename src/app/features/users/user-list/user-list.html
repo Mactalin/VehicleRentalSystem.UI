@@ -37,7 +37,6 @@
 @if (error()) { <div class="alert alert-danger" style="margin-bottom: 16px">{{ error() }}</div> }
 
 @if (loading()) {
-  <app-loading-spinner message="Loading users..." />
 } @else if (filtered().length === 0) {
   <div class="card empty-state">
     <h3>No users found</h3>

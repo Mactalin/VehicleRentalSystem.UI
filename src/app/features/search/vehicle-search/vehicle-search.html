@@ -89,7 +89,6 @@
 }
 
 @if (loading()) {
-  <app-loading-spinner message="Searching vehicles..." />
 } @else if (results().length === 0) {
   <div class="card empty-state vehicle-empty">
     <span class="empty-icon"><i class="bi bi-car-front"></i></span>

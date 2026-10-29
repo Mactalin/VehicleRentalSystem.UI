@@ -3,7 +3,6 @@
 <app-page-header title="Checkout" subtitle="Review your trip and pay the advance to confirm it" />
 
 @if (loading()) {
-  <app-loading-spinner message="Preparing your booking..." />
 } @else if (!vehicle() || !quote()) {
   <div class="alert alert-danger">{{ error() ?? 'We could not prepare this booking.' }}</div>
 } @else {

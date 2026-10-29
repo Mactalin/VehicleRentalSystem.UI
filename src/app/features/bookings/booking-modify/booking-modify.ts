@@ -6,13 +6,12 @@ import { Router, RouterLink } from '@angular/router';
 import { BookingDto, BookingQuoteDto } from '../../../core/models/booking.models';
 import { BookingService } from '../../../core/services/booking.service';
 import { localInputFromNow, toLocalInput, toUtcIso } from '../../../core/utils/date.util';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { PriceBreakdown } from '../../../shared/components/price-breakdown/price-breakdown/price-breakdown';
 
 @Component({
   selector: 'app-booking-modify',
-  imports: [ReactiveFormsModule, RouterLink, DatePipe, CurrencyPipe, PageHeader, LoadingSpinner, PriceBreakdown],
+  imports: [ReactiveFormsModule, RouterLink, DatePipe, CurrencyPipe, PageHeader, PriceBreakdown],
   templateUrl: './booking-modify.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

@@ -3,13 +3,12 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, input, signal } fro
 import { RouterLink } from '@angular/router';
 import { InvoiceDto } from '../../../core/models/payment.models';
 import { InvoiceService } from '../../../core/services/invoice.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 
 @Component({
   selector: 'app-invoice-view',
-  imports: [RouterLink, DatePipe, CurrencyPipe, PercentPipe, PageHeader, LoadingSpinner, StatusBadge],
+  imports: [RouterLink, DatePipe, CurrencyPipe, PercentPipe, PageHeader, StatusBadge],
   templateUrl: './invoice-view.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

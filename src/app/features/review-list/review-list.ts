@@ -1,22 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Review } from '../../core/models/review';
 import { ReviewService } from '../../core/services/reviewservice';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 
 @Component({
   selector: 'app-review-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, EmptyStateComponent, SpinnerComponent],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, EmptyStateComponent],
   templateUrl: './review-list.html',
   styleUrls: ['./review-list.css']
 })
 export class ReviewListComponent implements OnInit {
   reviews: Review[] = [];
-  loading = true;
+  loading = signal(true);
   filterRating = 0; // 0 = all
 
   constructor(private service: ReviewService) {}
@@ -26,10 +25,10 @@ export class ReviewListComponent implements OnInit {
   }
 
   loadReviews(): void {
-    this.loading = true;
+    this.loading.set(true);
     this.service.getAll().subscribe({
-      next: (data) => { this.reviews = data; this.loading = false; },
-      error: () => this.loading = false
+      next: (data) => { this.reviews = data; this.loading.set(false); },
+      error: () => this.loading.set(false)
     });
   }
 

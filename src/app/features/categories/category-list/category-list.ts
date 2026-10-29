@@ -3,14 +3,13 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { RouterLink } from '@angular/router';
 import { CategoryDto } from '../../../core/models/category.models';
 import { CategoryService } from '../../../core/services/category.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 import { ConfirmService } from '../../../shared/services/confirm.service';
 
 @Component({
   selector: 'app-category-list',
-  imports: [RouterLink, CurrencyPipe, PageHeader, StatusBadge, LoadingSpinner],
+  imports: [RouterLink, CurrencyPipe, PageHeader, StatusBadge],
   templateUrl: './category-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

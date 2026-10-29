@@ -3,13 +3,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { BranchDto, SaveBranchDto } from '../../../core/models/branch.models';
 import { BranchService } from '../../../core/services/branch.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { OperatingHours } from '../operating-hours/operating-hours';
 
 @Component({
   selector: 'app-branch-form',
-  imports: [ReactiveFormsModule, RouterLink, PageHeader, LoadingSpinner, OperatingHours],
+  imports: [ReactiveFormsModule, RouterLink, PageHeader, OperatingHours],
   templateUrl: './branch-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

@@ -3,14 +3,13 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { RouterLink } from '@angular/router';
 import { ExpiringDocumentDto } from '../../../core/models/vehicle.models';
 import { VehicleService } from '../../../core/services/vehicle.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
 @Component({
   selector: 'app-expiring-documents',
-  imports: [RouterLink, DatePipe, PageHeader, StatusBadge, LoadingSpinner, EnumLabelPipe],
+  imports: [RouterLink, DatePipe, PageHeader, StatusBadge, EnumLabelPipe],
   templateUrl: './expiring-documents.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

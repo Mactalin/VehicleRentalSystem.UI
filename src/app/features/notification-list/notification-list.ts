@@ -1,22 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { AppNotification, NotificationEvent } from '../../core/models/notification';
 import { NotificationService } from '../../core/services/notificationservice';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 
 @Component({
   selector: 'app-notification-list',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, EmptyStateComponent, SpinnerComponent],
+  imports: [CommonModule, PageHeaderComponent, EmptyStateComponent],
   templateUrl: './notification-list.html',
   styleUrls: ['./notification-list.css']
 })
 export class NotificationListComponent implements OnInit {
   notifications: AppNotification[] = [];
-  loading = true;
+  loading = signal(true);
   filter: 'all' | 'unread' = 'all';
 
   constructor(
@@ -29,18 +28,18 @@ export class NotificationListComponent implements OnInit {
   }
 
   loadNotifications(): void {
-    this.loading = true;
+    this.loading.set(true);
     const userId = this.auth.currentUser()?.id || 1; // Fallback to 1 for testing
 
     this.service.getByUser(userId).subscribe({
       next: (data) => {
         this.notifications = data;
         this.service.setUnreadCount(this.unreadCount);
-        this.loading = false;
+        this.loading.set(false);
       },
       error: () => {
         this.service.setUnreadCount(0);
-        this.loading = false;
+        this.loading.set(false);
       }
     });
   }

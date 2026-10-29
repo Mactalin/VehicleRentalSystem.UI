@@ -1,22 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Offer, CreateOffer } from '../../core/models/offer';
 import { OfferService } from '../../core/services/offerservice';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 
 @Component({
   selector: 'app-offer-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, SpinnerComponent, EmptyStateComponent],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, EmptyStateComponent],
   templateUrl: './offer-list.html',
   styleUrls: ['./offer-list.css']
 })
 export class OfferListComponent implements OnInit {
   offers: Offer[] = [];
-  loading = true;
+  loading = signal(true);
 
   showModal = false;
   submitting = false;
@@ -37,10 +36,10 @@ export class OfferListComponent implements OnInit {
   }
 
   loadOffers(): void {
-    this.loading = true;
+    this.loading.set(true);
     this.service.getAll().subscribe({
-      next: (data) => { this.offers = data; this.loading = false; },
-      error: () => this.loading = false
+      next: (data) => { this.offers = data; this.loading.set(false); },
+      error: () => this.loading.set(false)
     });
   }
 

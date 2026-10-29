@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { RouterLink } from '@angular/router';
 import { MaintenanceDto } from '../../../core/models/maintenance.models';
 import { MaintenanceService } from '../../../core/services/maintenance.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 
@@ -11,7 +10,7 @@ type Tab = 'Scheduled' | 'InProgress' | 'Completed' | 'Cancelled' | 'Upcoming';
 
 @Component({
   selector: 'app-maintenance-list',
-  imports: [RouterLink, DatePipe, CurrencyPipe, PageHeader, StatusBadge, LoadingSpinner],
+  imports: [RouterLink, DatePipe, CurrencyPipe, PageHeader, StatusBadge],
   templateUrl: './maintenance-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

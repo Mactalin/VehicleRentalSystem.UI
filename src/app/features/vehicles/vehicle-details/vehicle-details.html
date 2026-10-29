@@ -1,7 +1,6 @@
 <a class="back-link" routerLink="/vehicles">&larr; Back to vehicles</a>
 
 @if (loading()) {
-  <app-loading-spinner message="Loading vehicle..." />
 } @else if (vehicle(); as v) {
 
   <app-page-header [title]="v.make + ' ' + v.model" [subtitle]="v.registrationNumber">

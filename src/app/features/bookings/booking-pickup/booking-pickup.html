@@ -3,7 +3,6 @@
 <app-page-header title="Vehicle pickup" subtitle="Record the vehicle's condition before handing it over" />
 
 @if (loading()) {
-  <app-loading-spinner message="Loading booking..." />
 } @else if (booking(); as b) {
 
   <div class="card" style="margin-bottom: 20px">

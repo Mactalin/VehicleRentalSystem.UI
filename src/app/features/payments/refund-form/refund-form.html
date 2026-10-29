@@ -20,7 +20,6 @@
 }
 
 @if (loading()) {
-  <app-loading-spinner message="Loading payments..." />
 } @else if (searched() !== null) {
 
   @if (payments().length === 0) {

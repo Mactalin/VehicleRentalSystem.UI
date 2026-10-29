@@ -3,7 +3,6 @@
 </a>
 
 @if (loading()) {
-  <app-loading-spinner message="Loading booking..." />
 } @else if (booking(); as b) {
 
   <app-page-header [title]="b.bookingNumber" [subtitle]="b.vehicleName + ' · ' + b.vehicleRegistration">

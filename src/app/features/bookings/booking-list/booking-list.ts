@@ -4,13 +4,12 @@ import { RouterLink } from '@angular/router';
 import { BookingSummaryDto } from '../../../core/models/booking.models';
 import { BookingStatus } from '../../../core/models/enums';
 import { BookingService } from '../../../core/services/booking.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 
 @Component({
   selector: 'app-booking-list',
-  imports: [RouterLink, DatePipe, CurrencyPipe, PageHeader, LoadingSpinner, StatusBadge],
+  imports: [RouterLink, DatePipe, CurrencyPipe, PageHeader, StatusBadge],
   templateUrl: './booking-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

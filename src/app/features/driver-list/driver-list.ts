@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -6,20 +6,30 @@ import { DriverService } from '../../core/services/driverservice';
 import { Driver } from '../../core/models/driver';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 
 @Component({
   selector: 'app-driver-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PageHeaderComponent, EmptyStateComponent, SpinnerComponent],
+  imports: [CommonModule, FormsModule, RouterLink, PageHeaderComponent, EmptyStateComponent],
   templateUrl: './driver-list.html',
   styleUrls: ['./driver-list.css']
 })
 export class DriverListComponent implements OnInit {
-  drivers: Driver[] = [];
-  filteredDrivers: Driver[] = [];
-  loading = true;
-  searchTerm = '';
+  drivers = signal<Driver[] | null>(null);
+  loadError = signal('');
+  actionError = signal('');
+  searchTerm = signal('');
+  filteredDrivers = computed(() => {
+    const drivers = this.drivers() ?? [];
+    const term = this.searchTerm().trim().toLowerCase();
+    if (!term) return drivers;
+
+    return drivers.filter(driver =>
+      driver.fullName.toLowerCase().includes(term) ||
+      driver.licenseNumber.toLowerCase().includes(term) ||
+      driver.phone.includes(term)
+    );
+  });
 
   constructor(private driverService: DriverService) {}
 
@@ -28,29 +38,30 @@ export class DriverListComponent implements OnInit {
   }
 
   loadDrivers(): void {
-    this.loading = true;
+    this.loadError.set('');
     this.driverService.getAll().subscribe({
       next: (data) => {
-        this.drivers = data;
-        this.filteredDrivers = data;
-        this.loading = false;
+        this.drivers.set(data);
       },
-      error: () => this.loading = false
+      error: (err) => {
+        this.loadError.set(err?.name === 'TimeoutError'
+          ? 'Loading drivers took longer than 3 seconds. Please try again.'
+          : err?.message || 'Could not load drivers.');
+      }
     });
-  }
-
-  onSearch(): void {
-    const term = this.searchTerm.toLowerCase();
-    this.filteredDrivers = this.drivers.filter(d =>
-      d.fullName.toLowerCase().includes(term) ||
-      d.licenseNumber.toLowerCase().includes(term) ||
-      d.phone.includes(term)
-    );
   }
 
   deleteDriver(id: number, name: string): void {
     if (confirm(`Are you sure you want to delete driver ${name}?`)) {
-      this.driverService.delete(id).subscribe(() => this.loadDrivers());
+      this.actionError.set('');
+      this.driverService.delete(id).subscribe({
+        next: () => this.loadDrivers(),
+        error: (err) => {
+          this.actionError.set(err?.name === 'TimeoutError'
+            ? 'Deleting the driver took longer than 3 seconds. Check the list before trying again.'
+            : err?.message || 'Could not delete driver.');
+        }
+      });
     }
   }
 

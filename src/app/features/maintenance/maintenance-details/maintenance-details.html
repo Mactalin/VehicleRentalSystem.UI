@@ -1,7 +1,6 @@
 <a class="back-link" routerLink="/maintenance">&larr; Back to maintenance</a>
 
 @if (loading()) {
-  <app-loading-spinner message="Loading record..." />
 } @else if (record(); as r) {
 
   <app-page-header [title]="r.type + ' - ' + r.registrationNumber" subtitle="Maintenance record">

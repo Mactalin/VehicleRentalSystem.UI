@@ -4,7 +4,6 @@ import { RouterLink } from '@angular/router';
 import { BookingSummaryDto } from '../../../core/models/booking.models';
 import { BookingStatus } from '../../../core/models/enums';
 import { CustomerService } from '../../../core/services/customer.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 
@@ -19,7 +18,7 @@ const GROUPS: Record<Exclude<Tab, 'all'>, BookingStatus[]> = {
 
 @Component({
   selector: 'app-rental-history',
-  imports: [RouterLink, DatePipe, CurrencyPipe, PageHeader, LoadingSpinner, StatusBadge],
+  imports: [RouterLink, DatePipe, CurrencyPipe, PageHeader, StatusBadge],
   templateUrl: './rental-history.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

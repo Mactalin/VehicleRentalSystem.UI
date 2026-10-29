@@ -3,7 +3,6 @@
                  subtitle="Upload your ID and driving licence. Our team reviews them before your first booking." />
 
 @if (loading()) {
-  <app-loading-spinner message="Loading your documents..." />
 } @else if (customer(); as c) {
 
   <div class="alert alert-info" style="margin-bottom: 16px">

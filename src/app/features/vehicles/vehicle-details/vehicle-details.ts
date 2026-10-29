@@ -5,7 +5,6 @@ import { VehicleStatus } from '../../../core/models/enums';
 import { VehicleDto } from '../../../core/models/vehicle.models';
 import { AuthService } from '../../../core/services/auth.service';
 import { VehicleService } from '../../../core/services/vehicle.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 import { ConfirmService } from '../../../shared/services/confirm.service';
@@ -15,7 +14,7 @@ import { VehicleImages } from '../vehicle-images/vehicle-images';
 
 @Component({
   selector: 'app-vehicle-details',
-  imports: [RouterLink, DecimalPipe, PageHeader, StatusBadge, LoadingSpinner, EnumLabelPipe,VehicleImages, VehicleDocuments],
+  imports: [RouterLink, DecimalPipe, PageHeader, StatusBadge, EnumLabelPipe,VehicleImages, VehicleDocuments],
   templateUrl: './vehicle-details.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

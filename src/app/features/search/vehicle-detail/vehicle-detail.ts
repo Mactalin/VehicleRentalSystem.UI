@@ -11,13 +11,12 @@ import { BookingService } from '../../../core/services/booking.service';
 import { VehicleSearchService } from '../../../core/services/vehicle-search.service';
 import { VehicleService } from '../../../core/services/vehicle.service';
 import { localInputFromNow, toLocalInput, toUtcIso } from '../../../core/utils/date.util';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { PriceBreakdown } from '../../../shared/components/price-breakdown/price-breakdown/price-breakdown';
 
 @Component({
   selector: 'app-vehicle-detail',
-  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, PageHeader, LoadingSpinner, PriceBreakdown],
+  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, PageHeader, PriceBreakdown],
   templateUrl: './vehicle-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

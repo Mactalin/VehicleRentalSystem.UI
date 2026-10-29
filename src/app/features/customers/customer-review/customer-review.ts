@@ -6,7 +6,6 @@ import { CustomerStatus } from '../../../core/models/enums';
 import { AuthService } from '../../../core/services/auth.service';
 import { CustomerService } from '../../../core/services/customer.service';
 import { isHttpUrl } from '../../../core/utils/url.util';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 import { ConfirmService } from '../../../shared/services/confirm.service';
@@ -17,7 +16,7 @@ interface RejectTarget { kind: DocKind; id: number; label: string; }
 
 @Component({
   selector: 'app-customer-review',
-  imports: [RouterLink, DatePipe, PageHeader, LoadingSpinner, StatusBadge, EnumLabelPipe],
+  imports: [RouterLink, DatePipe, PageHeader, StatusBadge, EnumLabelPipe],
   templateUrl: './customer-review.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

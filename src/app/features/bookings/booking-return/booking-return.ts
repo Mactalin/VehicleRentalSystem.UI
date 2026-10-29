@@ -3,14 +3,13 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, si
 import { RouterLink } from '@angular/router';
 import { BookingDto, ReturnDto, ReturnSummaryDto } from '../../../core/models/booking.models';
 import { BookingService } from '../../../core/services/booking.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 import { InspectionForm } from '../inspection-form/inspection-form';
 
 @Component({
   selector: 'app-booking-return',
-  imports: [RouterLink, DatePipe, CurrencyPipe, PageHeader, LoadingSpinner, StatusBadge, InspectionForm],
+  imports: [RouterLink, DatePipe, CurrencyPipe, PageHeader, StatusBadge, InspectionForm],
   templateUrl: './booking-return.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

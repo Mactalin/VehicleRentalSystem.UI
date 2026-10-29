@@ -58,7 +58,6 @@
 }
 
 @if (loading()) {
-  <app-loading-spinner message="Loading vehicles..." />
 } @else if (filtered().length === 0) {
   <div class="card empty-state">
     <h3>No vehicles found</h3>

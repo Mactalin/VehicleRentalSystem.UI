@@ -72,7 +72,6 @@
   }
 
   @if (loading()) {
-    <app-loading-spinner />
   } @else if (charges().length === 0) {
     <div class="empty-state">
       <h3>No additional charges</h3>

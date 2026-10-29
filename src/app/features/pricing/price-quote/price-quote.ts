@@ -5,7 +5,6 @@ import { PriceQuoteDto } from '../../../core/models/category.models';
 import { VehicleDto } from '../../../core/models/vehicle.models';
 import { PricingService } from '../../../core/services/pricing.service';
 import { VehicleService } from '../../../core/services/vehicle.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 
@@ -30,7 +29,7 @@ const validRange: ValidatorFn = group => {
 
 @Component({
   selector: 'app-price-quote',
-  imports: [ReactiveFormsModule, CurrencyPipe, DecimalPipe, PageHeader, StatusBadge, LoadingSpinner],
+  imports: [ReactiveFormsModule, CurrencyPipe, DecimalPipe, PageHeader, StatusBadge],
   templateUrl: './price-quote.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

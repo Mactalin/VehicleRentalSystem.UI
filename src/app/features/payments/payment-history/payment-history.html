@@ -1,7 +1,6 @@
 <app-page-header title="Payments" subtitle="Every payment and refund on your bookings" />
 
 @if (loading()) {
-  <app-loading-spinner message="Loading your payments..." />
 } @else if (error()) {
   <div class="alert alert-danger">{{ error() }}</div>
 } @else if (!hasProfile()) {

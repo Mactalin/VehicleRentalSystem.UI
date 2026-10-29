@@ -1,19 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardStats } from '../../core/models/dashboard';
 import { DashboardService } from '../../core/services/dashboardservice';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, SpinnerComponent],
+  imports: [CommonModule],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
 export class DashboardComponent implements OnInit {
   stats?: DashboardStats;
-  loading = true;
+  loading = signal(true);
   error = '';
 
   constructor(private dashboardService: DashboardService) {}
@@ -23,21 +22,21 @@ export class DashboardComponent implements OnInit {
   }
 
   loadStats(): void {
-    this.loading = true;
+    this.loading.set(true);
     this.error = '';
 
     this.dashboardService.getStats().subscribe({
       next: (data) => {
         console.log('Dashboard Stats Loaded:', data); // ADD THIS
         this.stats = data;
-        this.loading = false;
+        this.loading.set(false);
       },
       error: (err) => {
          console.error('❌ Dashboard Error:', err); // ADD THIS
         console.error('Failed to load dashboard stats', err);
         this.stats = undefined;
         this.error = this.getErrorMessage(err);
-        this.loading = false;
+        this.loading.set(false);
       }
     });
   }

@@ -5,14 +5,13 @@ import { UserDto } from '../../../core/models/auth.models';
 import { RoleName } from '../../../core/models/enums';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 import { ConfirmService } from '../../../shared/services/confirm.service';
 
 @Component({
   selector: 'app-user-list',
-  imports: [RouterLink, DatePipe, PageHeader, StatusBadge, LoadingSpinner],
+  imports: [RouterLink, DatePipe, PageHeader, StatusBadge],
   templateUrl: './user-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

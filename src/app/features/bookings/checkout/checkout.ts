@@ -9,7 +9,6 @@ import { BookingService } from '../../../core/services/booking.service';
 import { BranchService } from '../../../core/services/branch.service';
 import { PaymentService } from '../../../core/services/payment.service';
 import { VehicleService } from '../../../core/services/vehicle.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { PriceBreakdown } from '../../../shared/components/price-breakdown/price-breakdown/price-breakdown';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
@@ -19,7 +18,7 @@ import { CurrencyPipe, DatePipe, NgTemplateOutlet } from '@angular/common';
   selector: 'app-checkout',
   imports: [
     RouterLink, DatePipe, CurrencyPipe, NgTemplateOutlet,
-    PageHeader, LoadingSpinner, PriceBreakdown, StatusBadge
+    PageHeader, PriceBreakdown, StatusBadge
   ],
   templateUrl: './checkout.html',
   changeDetection: ChangeDetectionStrategy.OnPush

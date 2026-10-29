@@ -3,14 +3,13 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CategoryDto } from '../../../core/models/category.models';
 import { CategoryService } from '../../../core/services/category.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { PricingForm } from '../pricing-form/pricing-form';
 import { SeasonalPricing } from '../seasonal-pricing/seasonal-pricing';
 
 @Component({
   selector: 'app-category-form',
-  imports: [ReactiveFormsModule, RouterLink, PageHeader, LoadingSpinner, PricingForm, SeasonalPricing],
+  imports: [ReactiveFormsModule, RouterLink, PageHeader, PricingForm, SeasonalPricing],
   templateUrl: './category-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { timeout } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { DriverService } from '../../core/services/driverservice';
 import { NotificationService } from '../../core/services/notificationservice';
@@ -18,9 +19,10 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
 export class DriverFormComponent implements OnInit {
   isEdit = false;
   driverId?: number;
-  loading = false;
+  loading = signal(false);
   submitting = false;
   error = '';
+  loadingError = '';
   notificationError = '';
   createdDriver?: Driver;
 
@@ -54,16 +56,29 @@ export class DriverFormComponent implements OnInit {
     if (id) {
       this.isEdit = true;
       this.driverId = +id;
-      this.loading = true;
-      this.service.getById(this.driverId).subscribe({
-        next: (data) => {
-          // Merge with existing model to ensure no undefined fields
-          this.model = { ...this.model, ...data };
-          this.loading = false;
-        },
-        error: () => { this.error = 'Could not load driver data.'; this.loading = false; }
-      });
+      this.loadDriver();
     }
+  }
+
+  loadDriver(): void {
+    if (!this.driverId) return;
+
+    this.loading.set(true);
+    this.loadingError = '';
+    this.service.getById(this.driverId).subscribe({
+      next: (data) => {
+        this.model = { ...this.model, ...data };
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.loadingError = this.extractError(
+          err,
+          'Could not load driver data.',
+          'Loading the driver took longer than 3 seconds. Please try again.'
+        );
+        this.loading.set(false);
+      }
+    });
   }
 
   onSubmit(): void {
@@ -81,7 +96,14 @@ export class DriverFormComponent implements OnInit {
     if (this.isEdit && this.driverId) {
       this.service.update(this.driverId, payload as UpdateDriver).subscribe({
         next: () => this.router.navigate(['/drivers']),
-        error: (err) => { this.error = this.extractError(err); this.submitting = false; }
+        error: (err) => {
+          this.error = this.extractError(
+            err,
+            'Failed to update driver.',
+            'Updating the driver took longer than 3 seconds. Please try again.'
+          );
+          this.submitting = false;
+        }
       });
     } else {
       this.service.create(payload as CreateDriver).subscribe({
@@ -89,7 +111,14 @@ export class DriverFormComponent implements OnInit {
           this.createdDriver = driver;
           this.sendDriverRegistration(driver);
         },
-        error: (err) => { this.error = this.extractError(err); this.submitting = false; }
+        error: (err) => {
+          this.error = this.extractError(
+            err,
+            'Failed to save driver.',
+            'Saving the driver took longer than 3 seconds. Check the drivers list before trying again, as the driver may already have been saved.'
+          );
+          this.submitting = false;
+        }
       });
     }
   }
@@ -118,7 +147,7 @@ export class DriverFormComponent implements OnInit {
       toPhone: phone,
       event: 'DriverRegistration',
       customMessage: `Welcome ${driver.fullName}. You have been added as a driver in the Vehicle Rental System.`
-    }).subscribe({
+    }).pipe(timeout({ first: 3000 })).subscribe({
       next: () => this.router.navigate(['/drivers']),
       error: () => {
         this.notificationError = 'Driver saved, but the email and SMS could not be sent. Please try again.';
@@ -127,8 +156,15 @@ export class DriverFormComponent implements OnInit {
     });
   }
 
-  // This will extract the EXACT error from ASP.NET Core
-  private extractError(err: any): string {
+  goToDrivers(): void {
+    this.router.navigate(['/drivers']);
+  }
+
+  private extractError(err: any, fallback: string, timeoutMessage: string): string {
+    if (err?.name === 'TimeoutError') {
+      return timeoutMessage;
+    }
+
     if (err?.status === 0) {
       return 'Cannot reach the API. Start the backend service or update the API URL in the environment configuration.';
     }
@@ -137,6 +173,6 @@ export class DriverFormComponent implements OnInit {
       const firstError = Object.values(err.error.errors)[0];
       if (Array.isArray(firstError)) return firstError[0];
     }
-    return err?.error?.detail || err?.error?.title || 'Failed to save driver.';
+    return err?.error?.detail || err?.error?.title || err?.message || fallback;
   }
 }

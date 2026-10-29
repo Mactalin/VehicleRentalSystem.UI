@@ -3,7 +3,6 @@
 <app-page-header title="Vehicle return" subtitle="Inspect the vehicle and work out any extra charges" />
 
 @if (loading()) {
-  <app-loading-spinner message="Loading booking..." />
 } @else if (booking(); as b) {
 
   <div class="card" style="margin-bottom: 20px">

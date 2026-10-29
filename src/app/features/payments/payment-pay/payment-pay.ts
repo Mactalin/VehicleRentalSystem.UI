@@ -9,7 +9,6 @@ import { AuthService } from '../../../core/services/auth.service';
 import { BookingService } from '../../../core/services/booking.service';
 import { PaymentService } from '../../../core/services/payment.service';
 import { methodLabel } from '../../../core/utils/payment.util';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge/status-badge';
 import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
@@ -23,7 +22,7 @@ interface DueItem {
 
 @Component({
   selector: 'app-payment-pay',
-  imports: [RouterLink, DatePipe, CurrencyPipe, PageHeader, LoadingSpinner, StatusBadge, EnumLabelPipe],
+  imports: [RouterLink, DatePipe, CurrencyPipe, PageHeader, StatusBadge, EnumLabelPipe],
   templateUrl: './payment-pay.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

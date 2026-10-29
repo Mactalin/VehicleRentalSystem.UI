@@ -7,12 +7,11 @@ import { MaintenanceDto, SaveMaintenanceDto } from '../../../core/models/mainten
 import { VehicleDto } from '../../../core/models/vehicle.models';
 import { MaintenanceService } from '../../../core/services/maintenance.service';
 import { VehicleService } from '../../../core/services/vehicle.service';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner/loading-spinner';
 import { PageHeader } from '../../../shared/components/page-header/page-header/page-header';
 
 @Component({
   selector: 'app-maintenance-form',
-  imports: [ReactiveFormsModule, RouterLink, PageHeader, LoadingSpinner],
+  imports: [ReactiveFormsModule, RouterLink, PageHeader],
   templateUrl: './maintenance-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

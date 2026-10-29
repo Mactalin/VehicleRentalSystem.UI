@@ -3,7 +3,6 @@
 <app-page-header title="Vehicle details" subtitle="Check the availability and reserve your trip" />
 
 @if (loading()) {
-  <app-loading-spinner message="Loading vehicle details..." />
 } @else if (!vehicle()) {
   <div class="alert alert-danger">{{ error() ?? 'This vehicle is not available.' }}</div>
 } @else {

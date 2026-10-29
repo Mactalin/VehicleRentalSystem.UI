@@ -5,7 +5,6 @@
 <app-page-header title="Make a payment" subtitle="Pay what is due on this booking" />
 
 @if (loading()) {
-  <app-loading-spinner message="Loading payment details..." />
 } @else if (booking(); as b) {
   @if (settlement(); as s) {
 

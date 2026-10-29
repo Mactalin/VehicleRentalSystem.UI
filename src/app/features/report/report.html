@@ -7,9 +7,8 @@
   </div>
 </app-page-header>
 
-<app-spinner *ngIf="loading"></app-spinner>
 
-<div class="row g-4" *ngIf="!loading && revenue && bookings">
+<div class="row g-4" *ngIf="!loading() && revenue && bookings">
 
   <!-- Revenue Section -->
   <div class="col-lg-8">

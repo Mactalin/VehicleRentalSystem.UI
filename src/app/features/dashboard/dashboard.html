@@ -7,9 +7,8 @@
   <div class="dashboard-live"><span></span> Live data</div>
 </section>
 
-<app-spinner *ngIf="loading"></app-spinner>
 
-<section *ngIf="!loading && error" class="dashboard-error alert alert-warning" role="alert">
+<section *ngIf="!loading() && error" class="dashboard-error alert alert-warning" role="alert">
   <i class="bi bi-exclamation-triangle-fill"></i>
   <div>
     <strong>Dashboard data is unavailable.</strong>
@@ -20,7 +19,7 @@
   </button>
 </section>
 
-<section *ngIf="!loading && stats" class="dashboard-content">
+<section *ngIf="!loading() && stats" class="dashboard-content">
   <div class="row g-3 g-xl-4">
     <div class="col-md-6 col-xl-3">
       <article class="stat-card stat-card--revenue">

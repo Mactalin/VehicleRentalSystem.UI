@@ -1,7 +1,6 @@
 <app-page-header title="My profile" subtitle="View and update your personal details" />
 
 @if (loading()) {
-  <app-loading-spinner />
 } @else if (profile(); as user) {
   <div class="profile-layout">
 

@@ -16,11 +16,10 @@
     </div>
   </div>
 
-  <app-spinner *ngIf="loading"></app-spinner>
 
-  <app-empty-state *ngIf="!loading && reviews.length === 0" icon="bi-star" title="No reviews yet" message="Once customers complete bookings, their reviews will appear here."></app-empty-state>
+  <app-empty-state *ngIf="!loading() && reviews.length === 0" icon="bi-star" title="No reviews yet" message="Once customers complete bookings, their reviews will appear here."></app-empty-state>
 
-  <div class="table-responsive" *ngIf="!loading && reviews.length > 0">
+  <div class="table-responsive" *ngIf="!loading() && reviews.length > 0">
     <table class="vr-table mb-0">
       <thead>
         <tr>

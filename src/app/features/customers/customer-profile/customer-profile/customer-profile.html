@@ -2,7 +2,6 @@
                  subtitle="The details we need before you can rent a vehicle" />
 
 @if (loading()) {
-  <app-loading-spinner message="Loading your profile..." />
 } @else {
 
   @if (required() && !customer()) {
