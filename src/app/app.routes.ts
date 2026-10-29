@@ -2,6 +2,9 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 
+const STAFF_ACCESS = roleGuard('Admin', 'Manager', 'Staff');
+const MANAGEMENT_ACCESS = roleGuard('Admin', 'Manager');
+
 export const routes: Routes = [
   // ==========================================
   // 1. LOGGED-IN APP (Protected by AuthGuard)
@@ -73,29 +76,32 @@ export const routes: Routes = [
       },
       {
         path: 'vehicles',
+        canActivate: [STAFF_ACCESS],
         loadChildren: () => import('./features/vehicles/vehicles.routes').then(m => m.VEHICLE_ROUTES)
       },
       {
         path: 'branches',
+        canActivate: [STAFF_ACCESS],
         loadChildren: () => import('./features/branches/branches.routes').then(m => m.BRANCH_ROUTES)
       },
       {
         path: 'pricing',
+        canActivate: [STAFF_ACCESS],
         loadChildren: () => import('./features/pricing/pricing.routes').then(m => m.PRICING_ROUTES)
       },
       {
         path: 'categories',
-        canActivate: [roleGuard('Admin', 'Manager')],
+        canActivate: [MANAGEMENT_ACCESS],
         loadChildren: () => import('./features/categories/categories.routes').then(m => m.CATEGORY_ROUTES)
       },
       {
         path: 'maintenance',
-        canActivate: [roleGuard('Admin', 'Manager', 'Staff')],
+        canActivate: [STAFF_ACCESS],
         loadChildren: () => import('./features/maintenance/maintenance.routes').then(m => m.MAINTENANCE_ROUTES)
       },
       {
         path: 'users',
-        canActivate: [roleGuard('Admin', 'Manager')],
+        canActivate: [MANAGEMENT_ACCESS],
         loadChildren: () => import('./features/users/users.routes').then(m => m.USER_ROUTES)
       },
 
@@ -107,42 +113,52 @@ export const routes: Routes = [
       },
       {
         path: 'drivers',
+        canActivate: [STAFF_ACCESS],
         loadComponent: () => import('./features/driver-list/driver-list').then(m => m.DriverListComponent)
       },
       {
         path: 'drivers/new',
+        canActivate: [STAFF_ACCESS],
         loadComponent: () => import('./features/driver-form/driver-form').then(m => m.DriverFormComponent)
       },
       {
         path: 'drivers/:id/edit',
+        canActivate: [STAFF_ACCESS],
         loadComponent: () => import('./features/driver-form/driver-form').then(m => m.DriverFormComponent)
       },
       {
         path: 'services',
+        canActivate: [STAFF_ACCESS],
         loadComponent: () => import('./features/service-list/service-list').then(m => m.ServiceListComponent)
       },
       {
         path: 'coupons',
+        canActivate: [STAFF_ACCESS],
         loadComponent: () => import('./features/coupon-list/coupon-list').then(m => m.CouponListComponent)
       },
       {
         path: 'offers',
+        canActivate: [STAFF_ACCESS],
         loadComponent: () => import('./features/offer-list/offer-list').then(m => m.OfferListComponent)
       },
       {
         path: 'reviews',
+        canActivate: [STAFF_ACCESS],
         loadComponent: () => import('./features/review-list/review-list').then(m => m.ReviewListComponent)
       },
       {
         path: 'complaints',
+        canActivate: [STAFF_ACCESS],
         loadComponent: () => import('./features/complain-list/complain-list').then(m => m.ComplaintListComponent)
       },
       {
         path: 'notifications',
+        canActivate: [STAFF_ACCESS],
         loadComponent: () => import('./features/notification-list/notification-list').then(m => m.NotificationListComponent)
       },
       {
         path: 'reports',
+        canActivate: [STAFF_ACCESS],
         loadComponent: () => import('./features/report/report').then(m => m.ReportsComponent)
       },
 

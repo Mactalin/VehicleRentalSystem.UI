@@ -19,8 +19,7 @@ export class MyProfile implements OnInit {
   private users = inject(UserService);
   private auth = inject(AuthService);
 
-  profile = signal<UserDto | null>(null);
-  loading = signal(true);
+  profile = signal<UserDto | null>(this.auth.user());
   saving = signal(false);
   error = signal<string | null>(null);
   success = signal(false);
@@ -39,16 +38,22 @@ export class MyProfile implements OnInit {
   get f() { return this.form.controls; }
 
   ngOnInit() {
+    const cachedUser = this.profile();
+    if (cachedUser) {
+      this.form.patchValue({ fullName: cachedUser.fullName, phone: cachedUser.phone ?? '' });
+    }
+
+    this.loadProfile();
+  }
+
+  loadProfile() {
+    this.error.set(null);
     this.users.getProfile().subscribe({
       next: user => {
         this.profile.set(user);
         this.form.patchValue({ fullName: user.fullName, phone: user.phone ?? '' });
-        this.loading.set(false);
       },
-      error: err => {
-        this.error.set(err.message);
-        this.loading.set(false);
-      }
+      error: err => this.error.set(err.message)
     });
   }
 
